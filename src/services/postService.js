@@ -1,0 +1,113 @@
+import { postsApi } from '../api';
+import { demoPosts } from '../constants/demoData';
+
+export const getPosts = async (offset = 0, limit = 30) => {
+  try {
+    const response = await postsApi.getPosts(offset, limit);
+    
+    return {
+      success: true,
+      data: response.data,
+      error: null,
+    };
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    // Return demo data when API fails
+    return {
+      success: false,
+      data: demoPosts,
+      error: error.message,
+    };
+  }
+};
+
+export const createPost = async (postData) => {
+  try {
+    const response = await postsApi.createPost(postData);
+    return {
+      success: true,
+      data: response.data,
+      error: null,
+    };
+  } catch (error) {
+    console.error('Error creating post:', error);
+    return {
+      success: false,
+      data: null,
+      error: error.message,
+    };
+  }
+};
+
+export const updatePost = async (postId, postData) => {
+  try {
+    const response = await postsApi.updatePost(postId, postData);
+    return {
+      success: true,
+      data: response.data,
+      error: null,
+    };
+  } catch (error) {
+    console.error('Error updating post:', error);
+    return {
+      success: false,
+      data: null,
+      error: error.message,
+    };
+  }
+};
+
+export const deletePost = async (postId) => {
+  try {
+    await postsApi.deletePost(postId);
+    return {
+      success: true,
+      data: null,
+      error: null,
+    };
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    return {
+      success: false,
+      data: null,
+      error: error.message,
+    };
+  }
+};
+
+export const likePost = async (postId, reactionType) => {
+  try {
+    const response = await postsApi.likePost(postId, reactionType);
+    return {
+      success: true,
+      data: response.data,
+      error: null,
+    };
+  } catch (error) {
+    console.error('Error liking post:', error);
+    return {
+      success: false,
+      data: null,
+      error: error.message,
+    };
+  }
+};
+
+export const unlikePost = async (postId, reactionType) => {
+  try {
+    const response = await postsApi.unlikePost(postId, reactionType);
+    return {
+      success: true,
+      data: response.data,
+      error: null,
+    };
+  } catch (error) {
+    console.error('Error unliking post:', error);
+    return {
+      success: false,
+      data: null,
+      error: error.message,
+    };
+  }
+};
+

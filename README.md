@@ -1,36 +1,142 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ImageGram - Dark-Themed Image Sharing Platform
+
+A modern, dark-themed image sharing and discussion platform built with Next.js, inspired by Instagram and Framer's design aesthetic.
+
+## Features
+
+- 🖼️ **Image Sharing**: Upload and share images with captions and descriptions
+- 💬 **Comments & Replies**: Full comment system with nested replies
+- ❤️ **Multiple Reaction Types**: Like, Love, Support, Congrats, and Smile reactions
+- 🔍 **Search**: Find posts by caption or description
+- 👤 **User Profiles**: View user profiles with stats and posts
+- 📱 **Responsive Design**: Mobile-first design that works on all devices
+- 🌙 **Dark Theme**: Beautiful dark theme inspired by Framer's design
+- ⚡ **Real-time Updates**: Live updates for likes, comments, and posts
+
+## Technology Stack
+
+- **Frontend**: Next.js 15, React 19
+- **Styling**: Tailwind CSS, Shadcn/UI, Radix UI
+- **Icons**: Lucide React
+- **HTTP Client**: Axios
+- **Language**: JavaScript (no TypeScript)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd frontend2
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+Create a `.env.local` file in the root directory:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Run the development server:
+```bash
+npm run dev
+```
 
-## Learn More
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-To learn more about Next.js, take a look at the following resources:
+## API Endpoints
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The application expects the following backend API endpoints:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `POST /api/v1/users` - Create user
+- `POST /api/v1/users/signup` - User signup
+- `POST /api/v1/posts` - Create post (accepts single image)
+- `GET /api/v1/posts?offset=0&limit=30` - Get posts with pagination
+- `PUT /api/v1/posts/:id` - Update post
+- `POST /api/v1/comments/comment` - Create comment
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+├── app/                    # Next.js app directory
+│   ├── globals.css        # Global styles and dark theme
+│   ├── layout.js          # Root layout
+│   ├── page.js            # Home/Feed page
+│   ├── upload/            # Upload page
+│   ├── search/            # Search page
+│   ├── activity/          # Activity page
+│   └── profile/           # Profile page
+├── components/            # Reusable components
+│   ├── ui/               # Base UI components
+│   ├── layout.js         # Main layout wrapper
+│   ├── navigation.js     # Navigation component
+│   ├── post-card.js      # Post display component
+│   ├── like-button.js    # Reaction system
+│   ├── comment-section.js # Comments and replies
+│   └── upload-form.js    # Image upload form
+└── lib/                  # Utilities and services
+    ├── api.js            # API service layer
+    └── utils.js          # Utility functions
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Key Components
+
+### PostCard
+Displays individual posts with:
+- User information and avatar
+- Image with proper aspect ratio
+- Like button with multiple reaction types
+- Comment section with replies
+- Share functionality
+
+### LikeButton
+Interactive reaction system with:
+- 5 different reaction types (Like, Love, Support, Congrats, Smile)
+- Visual feedback and counts
+- Toggle functionality
+
+### CommentSection
+Full-featured commenting system with:
+- Nested replies
+- Real-time updates
+- Reaction support for comments
+- Form validation
+
+### UploadForm
+Image upload interface with:
+- Drag-and-drop support
+- Image preview
+- Caption and description fields
+- Form validation
+
+## Styling
+
+The application uses a comprehensive dark theme with:
+- Custom CSS variables for consistent theming
+- Glass morphism effects
+- Gradient text elements
+- Smooth animations and transitions
+- Mobile-responsive design
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
