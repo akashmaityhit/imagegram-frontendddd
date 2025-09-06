@@ -6,8 +6,7 @@ import Layout from '@/components/layout/Layout';
 import PostCard from '@/components/features/PostCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { usePosts } from '@/hooks';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, usePosts } from '@/hooks';
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState('');

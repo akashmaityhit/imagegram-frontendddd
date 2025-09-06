@@ -1,10 +1,10 @@
+import { getCurrentUser } from '@/utils';
 import { postsApi } from '../api';
-import { demoPosts } from '../constants/demoData';
 
 export const getPosts = async (offset = 0, limit = 30) => {
   try {
     const response = await postsApi.getPosts(offset, limit);
-    
+
     return {
       success: true,
       data: response.data,
@@ -12,10 +12,9 @@ export const getPosts = async (offset = 0, limit = 30) => {
     };
   } catch (error) {
     console.error('Error fetching posts:', error);
-    // Return demo data when API fails
     return {
       success: false,
-      data: demoPosts,
+      data: null,
       error: error.message,
     };
   }
@@ -23,7 +22,15 @@ export const getPosts = async (offset = 0, limit = 30) => {
 
 export const createPost = async (postData) => {
   try {
-    const response = await postsApi.createPost(postData);
+    const user = await getCurrentUser();
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    console.log('Creating post for user:', user);
+    
+    
+    const response = await postsApi.createPost({...postData, user: user._id });
     return {
       success: true,
       data: response.data,

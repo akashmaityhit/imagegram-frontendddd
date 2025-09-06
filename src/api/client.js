@@ -1,10 +1,11 @@
 import axios from 'axios';
-import { getCookie, isTokenValid, clearAuthCookies, COOKIE_NAMES } from '../utils/cookies';
+import { getAuthToken, isTokenValid, removeAuthToken } from '../utils/auth';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:8000/api/v1";
-console.log('API Base URL:', API_BASE_URL);
+
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -13,7 +14,7 @@ const axiosInstance = axios.create({
 // Request interceptor to add auth token
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = getCookie(COOKIE_NAMES.AUTH_TOKEN);
+    const token = getAuthToken();
     if (token && isTokenValid(token)) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,7 +31,7 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Token is invalid or expired, clear auth data and redirect
-      clearAuthCookies();
+      removeAuthToken();
       if (typeof window !== 'undefined') {
         window.location.href = '/signin';
       }
@@ -40,4 +41,3 @@ axiosInstance.interceptors.response.use(
 );
 
 export default axiosInstance;
-

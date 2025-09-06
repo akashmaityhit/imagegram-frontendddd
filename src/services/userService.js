@@ -47,10 +47,9 @@ export const getUserProfile = async (userId) => {
     };
   } catch (error) {
     console.error('Error fetching user profile:', error);
-    // Return demo user when API fails
     return {
       success: false,
-      data: demoUser,
+      data: null,
       error: error.message,
     };
   }
@@ -66,10 +65,9 @@ export const getCurrentUserProfile = async () => {
     };
   } catch (error) {
     console.error('Error fetching user profile:', error);
-    // Return demo user when API fails
     return {
       success: false,
-      data: demoUser,
+      data: null,
       error: error.message,
     };
   }

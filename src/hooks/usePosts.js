@@ -13,9 +13,9 @@ export const usePosts = (initialOffset = 0, initialLimit = 30) => {
       const result = await getPosts(offset, limit);
       
       if (result.success) {
-        setPosts(result.data.posts);
+        setPosts(result.data.posts || result.data);
         setError(null);
-        setHasMore(result.data.posts.length === limit);
+        setHasMore((result.data.posts || result.data).length === limit);
       } else {
         setError(result.error);
       }
@@ -35,8 +35,8 @@ export const usePosts = (initialOffset = 0, initialLimit = 30) => {
       const result = await getPosts(posts.length, initialLimit);
       
       if (result.success) {
-        setPosts(prev => [...prev, ...result.data]);
-        setHasMore(result.data.length === initialLimit);
+        setPosts(prev => [...prev, ...(result.data.posts || result.data)]);
+        setHasMore((result.data.posts || result.data).length === initialLimit);
       }
     } catch (err) {
       console.error('Error loading more posts:', err);

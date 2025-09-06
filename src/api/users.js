@@ -1,10 +1,6 @@
 import axiosInstance from './client';
 
 export const usersApi = {
-  // Create a new user
-  createUser: (userData) => 
-    axiosInstance.post('/users', userData),
-
   // User signup
   signup: (userData) => 
     axiosInstance.post('/users/signup', userData),
@@ -17,9 +13,9 @@ export const usersApi = {
   getUserProfile: (userId) => 
     axiosInstance.get(`/users/${userId}`),
 
-  // Get Logged-in User Profile
+  // Get current user profile
   getCurrentUserProfile: () => 
-    axiosInstance.get(`/users/profile`),
+    axiosInstance.get('/users/profile'),
 
   // Update user profile
   updateUserProfile: (userId, userData) => 
@@ -36,13 +32,4 @@ export const usersApi = {
   // Unfollow a user
   unfollowUser: (userId) => 
     axiosInstance.delete(`/users/${userId}/follow`),
-
-  // Get user followers
-  getUserFollowers: (userId) => 
-    axiosInstance.get(`/users/${userId}/followers`),
-
-  // Get user following
-  getUserFollowing: (userId) => 
-    axiosInstance.get(`/users/${userId}/following`),
 };
-

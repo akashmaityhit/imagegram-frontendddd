@@ -10,7 +10,7 @@ export const postsApi = {
     const formData = new FormData();
     formData.append('image', postData.image);
     formData.append('caption', postData.caption);
-    formData.append('description', postData.description || '');
+    formData.append('user', postData.user);
     
     return axiosInstance.post('/posts', formData, {
       headers: {

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../hooks';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -32,7 +32,7 @@ const Navigation = () => {
     { href: '/profile', icon: User, label: 'Profile' },
   ];
 
-  const handleSignout = () => {
+  const onSignout = () => {
     signout();
     setIsMobileMenuOpen(false);
   };
@@ -80,7 +80,7 @@ const Navigation = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={handleSignout}
+                    onClick={onSignout}
                     className="flex items-center space-x-2"
                   >
                     <LogOut className="w-4 h-4" />
@@ -152,7 +152,7 @@ const Navigation = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={handleSignout}
+                      onClick={onSignout}
                       className="flex items-center space-x-2 w-full justify-start"
                     >
                       <LogOut className="w-4 h-4" />

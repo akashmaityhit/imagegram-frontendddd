@@ -1,6 +1,8 @@
 'use client';
 
-import Navigation from './Navigation';
+import Navigation from "./Navigation";
+
+
 
 const Layout = ({ children }) => {
   return (

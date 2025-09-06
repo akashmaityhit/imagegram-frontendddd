@@ -7,12 +7,10 @@ import PostCard from '@/components/features/PostCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useUser, usePosts } from '@/hooks';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, usePosts } from '@/hooks';
 
 export default function ProfilePage() {
-  const { user: authUser } = useAuth();
-  const { user, loading: userLoading } = useUser('current-user');
+  const { user, loading: userLoading } = useAuth();
   const { posts: userPosts, loading: postsLoading, likePost, unlikePost } = usePosts();
 
   const handleLikeChange = async (postId, reactionType, isActive) => {
@@ -28,8 +26,8 @@ export default function ProfilePage() {
 
   return (
     <Layout>
-        <div className="min-h-screen bg-background">
-          <div className="max-w-2xl mx-auto py-8 px-4">
+      <div className="min-h-screen bg-background">
+        <div className="max-w-2xl mx-auto py-8 px-4">
             {/* Profile Header */}
             <Card className="mb-8">
               <CardContent className="p-6">
@@ -42,8 +40,8 @@ export default function ProfilePage() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h1 className="text-2xl font-bold">{authUser?.username || user?.username}</h1>
-                      <p className="text-muted-foreground">{authUser?.username || user?.username}</p>
+                      <h1 className="text-2xl font-bold">{user?.username}</h1>
+                      <p className="text-muted-foreground">{user?.username}</p>
                       <p className="text-sm text-muted-foreground mt-1">{user?.bio}</p>
                     </div>
                   </div>
@@ -73,7 +71,7 @@ export default function ProfilePage() {
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <div className="flex items-center space-x-2">
                     <Mail className="w-4 h-4" />
-                    <span>{authUser?.email || user?.email}</span>
+                    <span>{user?.email}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Calendar className="w-4 h-4" />
@@ -119,7 +117,7 @@ export default function ProfilePage() {
               <div className="space-y-8">
                 {userPosts?.map((post) => (
                   <PostCard
-                    key={post.id}
+                    key={post._id}
                     post={post}
                     onLikeChange={handleLikeChange}
                     onCommentAdd={handleCommentAdd}

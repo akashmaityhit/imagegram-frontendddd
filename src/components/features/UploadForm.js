@@ -6,7 +6,7 @@ import { Camera, X, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { postService } from '@/services';
+import { createPost } from '@/services/postService';
 import { validateImageFile } from '@/utils';
 import { cn } from '@/utils';
 
@@ -53,10 +53,9 @@ const UploadForm = ({ onPostCreated, className }) => {
     setError(null);
     
     try {
-      const result = await postService.createPost({
+      const result = await createPost({
         image,
         caption,
-        description,
       });
 
       if (result.success) {
