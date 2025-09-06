@@ -113,7 +113,7 @@ export const getCurrentUser = () => {
   // Check if token is expired
   if (isTokenExpired(token)) {
     console.log('Token is expired, clearing...');
-    removeAuthToken();
+    // removeAuthToken();
     return null;
   }
   
