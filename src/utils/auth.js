@@ -6,7 +6,7 @@ export const setAuthToken = (token) => {
   if (typeof window === 'undefined') return;
   
   const expires = new Date();
-  expires.setTime(expires.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
+  expires.setTime(expires.getTime() + (1 * 24 * 60 * 60 * 1000)); // expires in 1 days
   
   // Set secure cookie
   document.cookie = `${AUTH_TOKEN_COOKIE}=${token}; expires=${expires.toUTCString()}; path=/; SameSite=Strict; Secure`;
@@ -67,6 +67,7 @@ export const isTokenExpired = (token) => {
     if (!payload || !payload.exp) return true;
     
     const currentTime = Math.floor(Date.now() / 1000);
+    console.log("currentTime", currentTime, "exp", payload.exp);
     return payload.exp < currentTime;
   } catch (error) {
     console.error('Error checking token expiration:', error);
