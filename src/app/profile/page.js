@@ -123,6 +123,8 @@ export default function ProfilePage() {
                     post={post}
                     onLikeChange={handleLikeChange}
                     onCommentAdd={handleCommentAdd}
+                    showOwnerActions={true}
+                    currentUserId={user?._id}
                   />
                 ))}
               </div>

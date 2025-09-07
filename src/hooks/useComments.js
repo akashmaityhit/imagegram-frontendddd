@@ -48,11 +48,10 @@ export const useComments = (postId) => {
       const result = await updateComment(commentId, commentData);
       
       if (result.success) {
-        setComments(prev => 
-          prev.map(comment => 
-            comment.id === commentId ? { ...comment, ...result.data } : comment
-          )
-        );
+        setComments(prev => prev.map(comment => {
+          const currentId = comment._id || comment.id;
+          return currentId === commentId ? { ...comment, ...result.data } : comment;
+        }));
         return { success: true, data: result.data };
       } else {
         return { success: false, error: result.error };
@@ -67,7 +66,7 @@ export const useComments = (postId) => {
       const result = await deleteComment(commentId);
       
       if (result.success) {
-        setComments(prev => prev.filter(comment => comment.id !== commentId));
+        setComments(prev => prev.filter(comment => (comment._id || comment.id) !== commentId));
         return { success: true };
       } else {
         return { success: false, error: result.error };
@@ -82,19 +81,18 @@ export const useComments = (postId) => {
       const result = await likeComment(commentId, reactionType);
       
       if (result.success) {
-        setComments(prev => 
-          prev.map(comment => 
-            comment.id === commentId 
-              ? {
-                  ...comment,
-                  reactions: {
-                    ...comment.reactions,
-                    [reactionType]: (comment.reactions[reactionType] || 0) + 1
-                  }
-                }
-              : comment
-          )
-        );
+        setComments(prev => prev.map(comment => {
+          const currentId = comment._id || comment.id;
+          if (currentId !== commentId) return comment;
+          const existingReactions = comment.reactions || {};
+          return {
+            ...comment,
+            reactions: {
+              ...existingReactions,
+              [reactionType]: (existingReactions[reactionType] || 0) + 1,
+            },
+          };
+        }));
         return { success: true };
       } else {
         return { success: false, error: result.error };
@@ -109,16 +107,14 @@ export const useComments = (postId) => {
       const result = await replyToComment(commentId, replyData);
       
       if (result.success) {
-        setComments(prev => 
-          prev.map(comment => 
-            comment.id === commentId 
-              ? {
-                  ...comment,
-                  replies: [...(comment.replies || []), result.data]
-                }
-              : comment
-          )
-        );
+        setComments(prev => prev.map(comment => {
+          const currentId = comment._id || comment.id;
+          if (currentId !== commentId) return comment;
+          return {
+            ...comment,
+            replies: [...(comment.replies || []), result.data],
+          };
+        }));
         return { success: true, data: result.data };
       } else {
         return { success: false, error: result.error };

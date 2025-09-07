@@ -1,16 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Send, User, Reply } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LikeButton from './LikeButton';
 import { cn } from '@/utils';
-
+import { createComment as createCommentService, updateComment as updateCommentService } from '@/services';
 const CommentSection = ({  
+  postId,
   comments = [], 
-  onCommentAdd,
+  postId,
   className 
 }) => {
   const [newComment, setNewComment] = useState('');
@@ -18,32 +19,34 @@ const CommentSection = ({
   const [replyText, setReplyText] = useState('');
 
   const handleAddComment = (e) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-
+  const [commentsList, setCommentsList] = useState(comments);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingText, setEditingText] = useState('');
     onCommentAdd?.({
-      content: newComment,
-      onModel: 'Post'
-    });
-    setNewComment('');
-  };
+  useEffect(() => {
+    setCommentsList(comments);
+  }, [comments]);
+
+  const handleAddComment = async (e) => {
 
   const handleAddReply = (parentId) => {
     if (!replyText.trim()) return;
+    // Create via API to ensure persistence, then update local list to rerender
+    onCommentAdd?.({
+      content: replyText,
+      onModel: 'Post',
+      postId,
+      parentId,nt,
+        onModel: 'Post',
+        postId,
+      });
+      if (result?.success && result?.data) {
+        setCommentsList(prev => [result.data, ...prev]);
+      }
+    } catch {}
 
-    onCommentAdd?.(postId, {
-      text: replyText,
-      parentId: parentId,
-    });
-    setReplyText('');
-    setReplyingTo(null);
-  };
-
-  const handleLikeChange = (commentId, reactionType, isActive) => {
-    // Handle comment like changes
-    console.log('Comment like changed:', commentId, reactionType, isActive);
-  };
-
+    // Backward compatibility callback
+    onCommentAdd?.({ content: newComment, onModel: 'Post' });
   const renderComment = (comment, isReply = false) => (
     <div key={comment._id} className={cn("space-y-2", isReply && "ml-8")}>
       <div className="flex items-start space-x-3">
@@ -58,32 +61,32 @@ const CommentSection = ({
             <span className="font-semibold text-sm">{comment.userId?.username || 'Anonymous'}</span>
             <span className="text-xs text-muted-foreground">
               {new Date(comment.updatedAt).toLocaleDateString()}
-            </span>
-          </div>
-          <p className="text-sm">{comment.content}</p>
-          <div className="flex items-center space-x-4">
-            <LikeButton
-              postId={comment._id}
-              initialReactions={comment?.reactions || {}}
-              onReactionChange={handleLikeChange}
-              className="text-xs"
-            />
-            {!isReply && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setReplyingTo(comment._id)}
-                className="text-xs h-auto p-0"
-              >
-                <Reply className="w-3 h-3 mr-1" />
-                Reply
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
+  const startEditing = (comment) => {
+    setEditingCommentId(comment._id);
+    setEditingText(comment.content || '');
+  };
 
-      {/* Reply form */}
+  const cancelEditing = () => {
+    setEditingCommentId(null);
+    setEditingText('');
+  };
+
+  const saveEdit = async (commentId) => {
+    if (!editingText.trim()) return;
+    try {
+      const result = await updateCommentService(commentId, { content: editingText });
+      if (result?.success && result?.data) {
+        setCommentsList(prev => prev.map(c => c._id === commentId ? { ...c, ...result.data } : c));
+      } else {
+        setCommentsList(prev => prev.map(c => c._id === commentId ? { ...c, content: editingText } : c));
+      }
+    } catch {
+      setCommentsList(prev => prev.map(c => c._id === commentId ? { ...c, content: editingText } : c));
+    } finally {
+      cancelEditing();
+    }
+  };
+
       {replyingTo === comment._id && (
         <div className="ml-11 space-y-2">
           <div className="flex items-center space-x-2">
@@ -105,21 +108,21 @@ const CommentSection = ({
               variant="ghost"
               size="sm"
               onClick={() => {
-                setReplyingTo(null);
-                setReplyText('');
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Render replies */}
-      {comment.replies && comment.replies.length > 0 && (
-        <div className="space-y-2">
-          {comment.replies.map((reply) => renderComment(reply, true))}
-        </div>
+          {editingCommentId === comment._id ? (
+            <div className="space-y-2">
+              <Input
+                value={editingText}
+                onChange={(e) => setEditingText(e.target.value)}
+                className="flex-1"
+              />
+              <div className="flex items-center space-x-2">
+                <Button size="sm" onClick={() => saveEdit(comment._id)} disabled={!editingText.trim()}>Save</Button>
+                <Button variant="ghost" size="sm" onClick={cancelEditing}>Cancel</Button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm">{comment.content}</p>
+          )}v>
       )}
     </div>
   );
@@ -138,14 +141,14 @@ const CommentSection = ({
       </div>
 
       {/* Add comment form */}
-      <form onSubmit={handleAddComment} className="flex items-center space-x-2">
-        <Input
-          placeholder="Add a comment..."
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          className="flex-1"
-        />
-        <Button
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => startEditing(comment)}
+              className="text-xs h-auto p-0"
+            >
+              Edit
+            </Button>
           type="submit"
           size="sm"
           disabled={!newComment.trim()}
