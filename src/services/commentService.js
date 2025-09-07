@@ -21,7 +21,7 @@ export const createComment = async (commentData) => {
   }
 };
 
-export const getPostComments = async (postId, offset = 0, limit = 3) => {
+export const getPostComments = async (postId, offset = 0, limit = 5) => {
   try {
     const response = await commentsApi.getPostComments(postId, offset, limit);
     return {

@@ -42,12 +42,12 @@ const PostCard = ({
     onLikeChange?.(postId, reactionType, isActive);
   };
 
+  
+
   const postId = post._id;
 
   // Comments hook bound to this post
   const {
-    comments: postComments,
-    fetchComments,
     createComment,
     updateComment,
   } = useComments(postId);
@@ -63,7 +63,7 @@ const PostCard = ({
     setShowComments(next);
     if (next) {
       // Fetch comments when opening the section
-      await fetchComments();
+      // await fetchComments();
     }
   };
 
@@ -202,7 +202,7 @@ const PostCard = ({
           {showComments && (
             <CommentSection
               postId={postId}
-              comments={postComments || []}
+              comments={post.comments || []}
               onCommentAdd={handleCommentAdd}
             />
           )}
