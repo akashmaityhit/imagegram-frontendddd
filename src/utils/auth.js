@@ -67,8 +67,6 @@ export const isTokenExpired = (token) => {
     if (!payload || !payload.exp) return true;
     
     const currentTime = Math.floor(Date.now() / 1000);
-    console.log("currentTime", currentTime, "exp", payload.exp);
-    alert(`exp: ${payload.exp}, currentTime: ${currentTime}, ${payload.exp < currentTime}`);
     return payload.exp < currentTime;
   } catch (error) {
     console.error('Error checking token expiration:', error);
@@ -109,6 +107,7 @@ export const isTokenValid = (token) => {
 // Get current user from stored token
 export const getCurrentUser = () => {
   const token = getAuthToken();
+  console.log('Current token(utils/auth):', token);
   if (!token) return null;
   
   // Check if token is expired
