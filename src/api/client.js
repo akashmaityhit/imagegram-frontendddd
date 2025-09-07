@@ -36,7 +36,7 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token is invalid or expired, clear auth data and redirect
       console.log("response error msg:", error.response)
-      removeAuthToken();
+      // removeAuthToken();
       // if (typeof window !== 'undefined') {
       //   window.location.href = '/signin';
       // }
