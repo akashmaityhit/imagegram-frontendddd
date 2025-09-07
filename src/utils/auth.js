@@ -68,6 +68,7 @@ export const isTokenExpired = (token) => {
     
     const currentTime = Math.floor(Date.now() / 1000);
     console.log("currentTime", currentTime, "exp", payload.exp);
+    alert(`exp: ${payload.exp}, currentTime: ${currentTime}, ${payload.exp < currentTime}`);
     return payload.exp < currentTime;
   } catch (error) {
     console.error('Error checking token expiration:', error);
@@ -113,7 +114,7 @@ export const getCurrentUser = () => {
   // Check if token is expired
   if (isTokenExpired(token)) {
     console.log('Token is expired, clearing...');
-    // removeAuthToken();
+    removeAuthToken();
     return null;
   }
   

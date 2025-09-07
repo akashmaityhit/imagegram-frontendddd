@@ -66,10 +66,10 @@ export const useAuth = () => {
       }
     };
 
-    // Check token every 5 minutes
-    const interval = setInterval(validateToken, 5 * 60 * 1000);
+    // // Check token every 5 minutes
+    // const interval = setInterval(validateToken, 5 * 60 * 1000);
     
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, [isAuth]);
 
   const signin = useCallback(async (credentials) => {
