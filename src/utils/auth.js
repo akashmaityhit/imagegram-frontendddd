@@ -80,7 +80,6 @@ export const getUserFromToken = (token) => {
   
   try {
     const decoded = decodeJWT(token);
-    console.log("decoded", decoded);
     return decoded;
   } catch (error) {
     console.error('Error decoding token:', error);
@@ -107,12 +106,10 @@ export const isTokenValid = (token) => {
 // Get current user from stored token
 export const getCurrentUser = () => {
   const token = getAuthToken();
-  console.log('Current token(utils/auth):', token);
   if (!token) return null;
   
   // Check if token is expired
   if (isTokenExpired(token)) {
-    console.log('Token is expired, clearing...');
     removeAuthToken();
     return null;
   }
@@ -127,7 +124,6 @@ export const isAuthenticated = () => {
   
   // Check if token is valid and not expired
   if (!isTokenValid(token) || isTokenExpired(token)) {
-    console.log('Token is invalid or expired, clearing...');
     removeAuthToken();
     return false;
   }

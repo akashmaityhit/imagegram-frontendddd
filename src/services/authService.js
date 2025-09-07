@@ -5,16 +5,14 @@ export const authService = {
   // Sign up a new user
   signup: async (userData) => {
     try {
-      console.log('AuthService: Starting signup process...');
+  
       const response = await usersApi.signup(userData);
-      console.log('AuthService: Signup response:', response.data);
-      
+
       if (response.data && response.data.success && response.data.token) {
         // Store token from backend response
         const token = response.data.token;
         if (token) {
           setAuthToken(token);
-          console.log('AuthService: Token stored successfully');
         } else {
           console.error('AuthService: No token in response');
         }
@@ -46,15 +44,13 @@ export const authService = {
   // Sign in user
   signin: async (credentials) => {
     try {
-      console.log('AuthService: Starting signin process...');
+
       const response = await usersApi.signin(credentials);
-      console.log('AuthService: Signin response:', response.data);
       
       if (response.data && response.data.success && response.data.token) {
         // Store token from backend response
         const token = response.data.token;
         setAuthToken(token);
-        console.log('AuthService: Token stored successfully');
         
         return {
           success: true,
@@ -82,19 +78,16 @@ export const authService = {
 
   // Sign out user
   signout: () => {
-    console.log('AuthService: Signing out user...');
     signOut();
   },
 
   // Get current user from token
   getCurrentUser: () => {
-    console.log('AuthService: Getting current user...');
     return getCurrentUser();
   },
 
   // Check if user is authenticated
   isAuthenticated: () => {
-    console.log('AuthService: Checking authentication...');
     return isAuthenticated();
   }
 };

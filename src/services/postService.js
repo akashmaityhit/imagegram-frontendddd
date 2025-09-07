@@ -1,7 +1,7 @@
 import { getCurrentUser } from '@/utils';
 import { postsApi } from '../api';
 
-export const getPosts = async (offset = 0, limit = 30) => {
+export const getPosts = async (offset = 0, limit = 5) => {
   try {
     const response = await postsApi.getPosts(offset, limit);
 

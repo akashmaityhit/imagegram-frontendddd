@@ -8,8 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LikeButton from './LikeButton';
 import { cn } from '@/utils';
 
-const CommentSection = ({ 
-  postId, 
+const CommentSection = ({  
   comments = [], 
   onCommentAdd,
   className 
@@ -22,9 +21,9 @@ const CommentSection = ({
     e.preventDefault();
     if (!newComment.trim()) return;
 
-    onCommentAdd?.(postId, {
-      text: newComment,
-      parentId: null,
+    onCommentAdd?.({
+      content: newComment,
+      onModel: 'Post'
     });
     setNewComment('');
   };
@@ -46,26 +45,26 @@ const CommentSection = ({
   };
 
   const renderComment = (comment, isReply = false) => (
-    <div key={comment.id} className={cn("space-y-2", isReply && "ml-8")}>
+    <div key={comment._id} className={cn("space-y-2", isReply && "ml-8")}>
       <div className="flex items-start space-x-3">
         <Avatar className="w-8 h-8">
-          <AvatarImage src={comment.user?.avatar} alt={comment.user?.name} />
+          <AvatarImage src={comment.userId?.avatar} alt={comment.userId?.name} />
           <AvatarFallback>
             <User className="w-4 h-4" />
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 space-y-1">
           <div className="flex items-center space-x-2">
-            <span className="font-semibold text-sm">{comment.user?.name || 'Anonymous'}</span>
+            <span className="font-semibold text-sm">{comment.userId?.username || 'Anonymous'}</span>
             <span className="text-xs text-muted-foreground">
-              {new Date(comment.createdAt).toLocaleDateString()}
+              {new Date(comment.updatedAt).toLocaleDateString()}
             </span>
           </div>
-          <p className="text-sm">{comment.text}</p>
+          <p className="text-sm">{comment.content}</p>
           <div className="flex items-center space-x-4">
             <LikeButton
-              postId={comment.id}
-              initialReactions={comment.reactions || {}}
+              postId={comment._id}
+              initialReactions={comment?.reactions || {}}
               onReactionChange={handleLikeChange}
               className="text-xs"
             />
@@ -73,7 +72,7 @@ const CommentSection = ({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setReplyingTo(comment.id)}
+                onClick={() => setReplyingTo(comment._id)}
                 className="text-xs h-auto p-0"
               >
                 <Reply className="w-3 h-3 mr-1" />
@@ -85,7 +84,7 @@ const CommentSection = ({
       </div>
 
       {/* Reply form */}
-      {replyingTo === comment.id && (
+      {replyingTo === comment._id && (
         <div className="ml-11 space-y-2">
           <div className="flex items-center space-x-2">
             <Input
@@ -93,11 +92,11 @@ const CommentSection = ({
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
               className="flex-1"
-              onKeyPress={(e) => e.key === 'Enter' && handleAddReply(comment.id)}
+              onKeyPress={(e) => e.key === 'Enter' && handleAddReply(comment._id)}
             />
             <Button
               size="sm"
-              onClick={() => handleAddReply(comment.id)}
+              onClick={() => handleAddReply(comment._id)}
               disabled={!replyText.trim()}
             >
               <Send className="w-4 h-4" />

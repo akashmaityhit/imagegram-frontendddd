@@ -1,8 +1,11 @@
+import { getCurrentUser } from '@/utils';
 import { commentsApi } from '../api';
 
 export const createComment = async (commentData) => {
   try {
+
     const response = await commentsApi.createComment(commentData);
+
     return {
       success: true,
       data: response.data,
@@ -18,7 +21,7 @@ export const createComment = async (commentData) => {
   }
 };
 
-export const getPostComments = async (postId, offset = 0, limit = 30) => {
+export const getPostComments = async (postId, offset = 0, limit = 3) => {
   try {
     const response = await commentsApi.getPostComments(postId, offset, limit);
     return {

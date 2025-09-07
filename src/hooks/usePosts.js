@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getPosts, createPost, updatePost, deletePost, likePost, unlikePost } from '../services';
 
-export const usePosts = (initialOffset = 0, initialLimit = 30) => {
+export const usePosts = (initialOffset = 0, initialLimit = 10) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,9 +13,9 @@ export const usePosts = (initialOffset = 0, initialLimit = 30) => {
       const result = await getPosts(offset, limit);
       
       if (result.success) {
-        setPosts(result.data.posts || result.data);
+        setPosts(result.data.posts);
         setError(null);
-        setHasMore((result.data.posts || result.data).length === limit);
+        setHasMore(result.data.totalDocuments > result.data.posts.length);
       } else {
         setError(result.error);
       }
@@ -35,8 +35,8 @@ export const usePosts = (initialOffset = 0, initialLimit = 30) => {
       const result = await getPosts(posts.length, initialLimit);
       
       if (result.success) {
-        setPosts(prev => [...prev, ...(result.data.posts || result.data)]);
-        setHasMore((result.data.posts || result.data).length === initialLimit);
+        setPosts(prev => [...prev, ...result.data.posts]);
+        setHasMore(result.data.totalDocuments > posts.length + initialLimit);
       }
     } catch (err) {
       console.error('Error loading more posts:', err);

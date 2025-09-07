@@ -24,8 +24,8 @@ const PostCard = ({
     onLikeChange?.(postId, reactionType, isActive);
   };
 
-  const handleCommentAdd = (comment) => {
-    onCommentAdd?.(post.id, comment);
+  const handleCommentAdd = (commentObj) => {
+    onCommentAdd?.({...commentObj, commentableId: post._id});
   };
 
   return (
@@ -46,7 +46,7 @@ const PostCard = ({
               </p>
             </div>
           </div>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={()=> { /* More options action */ }}>
             <MoreHorizontal className="w-4 h-4" />
           </Button>
         </div>
@@ -94,12 +94,12 @@ const PostCard = ({
           {post.caption && (
             <div className="space-y-1">
               <p className="text-sm">
-                <span className="font-semibold">{post.user?.name || 'Anonymous'}</span>
+                <span className="font-semibold">{post.user?.username || 'Anonymous'}</span>
                 {' '}
                 <span>{post.caption}</span>
               </p>
-              {post.description && (
-                <p className="text-sm text-muted-foreground">{post.description}</p>
+              {post?.description && (
+                <p className="text-sm text-muted-foreground">{post?.description}</p>
               )}
             </div>
           )}
@@ -107,7 +107,7 @@ const PostCard = ({
           {/* Comments Section */}
           {showComments && (
             <CommentSection
-              postId={post.id}
+              postId={post._id}
               comments={post.comments || []}
               onCommentAdd={handleCommentAdd}
             />

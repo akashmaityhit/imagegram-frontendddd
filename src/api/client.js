@@ -6,9 +6,9 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhos
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // headers: {
+  //   'Content-Type': 'application/json',
+  // },
 });
 
 // Request interceptor to add auth token
