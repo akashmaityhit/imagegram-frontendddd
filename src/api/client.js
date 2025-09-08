@@ -15,7 +15,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
-    console.log('Request token:', token);
+    // console.log('Request token:', token);
     if (token && isTokenValid(token)) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -29,13 +29,13 @@ axiosInstance.interceptors.request.use(
 // Response interceptor for error handling
 axiosInstance.interceptors.response.use(
   (response) => {
-    console.log('Response:', response);
+    // console.log('Response:', response);
     return response;
   },
   (error) => {
     if (error.response?.status === 401) {
       // Token is invalid or expired, clear auth data and redirect
-      console.log("response error msg:", error.response)
+      // console.log("response error msg:", error.response)
       // removeAuthToken();
       // if (typeof window !== 'undefined') {
       //   window.location.href = '/signin';

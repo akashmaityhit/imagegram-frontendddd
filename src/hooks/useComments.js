@@ -34,6 +34,7 @@ export const useComments = (postId) => {
       
       if (result.success) {
         setComments(prev => [result.data, ...prev]);
+        console.log(comments);
         return { success: true, data: result.data };
       } else {
         return { success: false, error: result.error };
@@ -66,7 +67,7 @@ export const useComments = (postId) => {
       const result = await deleteComment(commentId);
       
       if (result.success) {
-        setComments(prev => prev.filter(comment => (comment._id || comment.id) !== commentId));
+        setComments(prev => prev.filter(comment => comment._id !== commentId));
         return { success: true };
       } else {
         return { success: false, error: result.error };

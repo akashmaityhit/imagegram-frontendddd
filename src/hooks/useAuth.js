@@ -14,23 +14,23 @@ export const useAuth = () => {
   // Initialize authentication state
   const initializeAuth = useCallback(() => {
     try {
-      console.log('Initializing authentication...');
+      // console.log('Initializing authentication...');
       
       // Check if user is authenticated using cookie token
       const authenticated = isAuthenticated();
-      console.log('Is authenticated:', authenticated);
+      // console.log('Is authenticated:', authenticated);
       
       if (authenticated) {
         // Get user data from token
         const currentUser = getCurrentUser();
-        console.log('Current user from token:', currentUser);
+        // console.log('Current user from token:', currentUser);
         
         if (currentUser) {
           setUser(currentUser);
           setIsAuth(true);
         } else {
           // Token exists but user data is invalid
-          console.log('Invalid user data, signing out...');
+          // console.log('Invalid user data, signing out...');
           signOut();
         }
       } else {
@@ -75,19 +75,19 @@ export const useAuth = () => {
   const signin = useCallback(async (credentials) => {
     try {
       setLoading(true);
-      console.log('Attempting signin...');
+      // console.log('Attempting signin...');
       
       const result = await authService.signin(credentials);
       
       if (result.success) {
-        console.log('Signin successful, getting user data...');
+        // console.log('Signin successful, getting user data...');
         
         // Get user data from token after successful signin
         const currentUser = getCurrentUser();
         if (currentUser) {
           setUser(currentUser);
           setIsAuth(true);
-          console.log('User data set:', currentUser);
+          // console.log('Current user:', currentUser);
         } else {
           console.error('Failed to get user data after signin');
           return { success: false, error: 'Failed to get user data' };
@@ -109,19 +109,19 @@ export const useAuth = () => {
   const signup = useCallback(async (userData) => {
     try {
       setLoading(true);
-      console.log('Attempting signup...');
+      // console.log('Attempting signup...');
       
       const result = await authService.signup(userData);
       
       if (result.success) {
-        console.log('Signup successful, getting user data...');
+        // console.log('Signup successful, getting user data...');
         
         // Get user data from token after successful signup
         const currentUser = getCurrentUser();
         if (currentUser) {
           setUser(currentUser);
           setIsAuth(true);
-          console.log('User data set:', currentUser);
+          console.log('Current user:', currentUser);
         } else {
           console.error('Failed to get user data after signup');
           return { success: false, error: 'Failed to get user data' };
@@ -152,7 +152,7 @@ export const useAuth = () => {
   }, []);
 
   const refreshAuth = useCallback(() => {
-    console.log('Refreshing authentication...');
+    // console.log('Refreshing authentication...');
     initializeAuth();
   }, [initializeAuth]);
 

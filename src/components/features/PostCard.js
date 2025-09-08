@@ -55,7 +55,7 @@ const PostCard = ({
   const handleCommentAdd = async (commentObj) => {
     // Ensure payload contains the target post
     const payload = { ...commentObj, commentableId: postId };
-    await createComment(payload);
+    const response = await createComment(payload);
   };
 
   const handleToggleComments = async () => {

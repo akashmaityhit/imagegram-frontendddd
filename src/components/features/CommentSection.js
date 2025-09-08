@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Send, User, Reply } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,12 @@ const CommentSection = ({
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState('');
+
+  
+
+  useEffect(() => {
+
+  },[comments])
 
   const handleAddComment = (e) => {
     e.preventDefault();
