@@ -29,9 +29,6 @@ export default function HomePage() {
     }
   };
 
-  const handleCommentAdd = async (commentObj) => {
-    await createComment(commentObj);
-  };
 
   const handleRefresh = () => {
     fetchPosts();
@@ -120,7 +117,6 @@ export default function HomePage() {
                   key={post._id}
                   post={post}
                   onLikeChange={handleLikeChange}
-                  onCommentAdd={handleCommentAdd}
                 />
               ))}
               

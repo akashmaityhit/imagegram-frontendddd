@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { createComment, getPostComments, updateComment, deleteComment, likeComment, unlikeComment, replyToComment } from '../services';
 
-export const useComments = (postId) => {
-  const [comments, setComments] = useState([]);
+export const useComments = (postId, initialComments = []) => {
+  const [comments, setComments] = useState(initialComments);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -27,20 +27,37 @@ export const useComments = (postId) => {
 
   const createCommentHandler = async (commentData) => {
     try {
-      const result = await createComment({
-        ...commentData,
-        postId,
-      });
-      
+      const result = await createComment(commentData);
       if (result.success) {
-        setComments(prev => [result.data, ...prev]);
-        console.log(comments);
+        setComments(prev => [result.data.newComment, ...prev]);
+        
         return { success: true, data: result.data };
       } else {
         return { success: false, error: result.error };
       }
     } catch (err) {
       return { success: false, error: 'Failed to create comment' };
+    }
+  };
+
+  const replyToCommentHandler = async (commentId, commentData) => {
+    try {
+      const result = await replyToComment(commentData);
+      
+      if (result.success) {
+        setComments(prev => prev.map(comment => {
+          if (comment._id !== commentId) return comment;
+          return {
+            ...comment,
+            replies: [result.data.newComment, ...(comment.replies || [])],
+          };
+        }));
+        return { success: true, data: result.data };
+      } else {
+        return { success: false, error: result.error };
+      }
+    } catch (err) {
+      return { success: false, error: 'Failed to reply to comment' };
     }
   };
 
@@ -103,38 +120,17 @@ export const useComments = (postId) => {
     }
   };
 
-  const replyToCommentHandler = async (commentId, replyData) => {
-    try {
-      const result = await replyToComment(commentId, replyData);
-      
-      if (result.success) {
-        setComments(prev => prev.map(comment => {
-          const currentId = comment._id || comment.id;
-          if (currentId !== commentId) return comment;
-          return {
-            ...comment,
-            replies: [...(comment.replies || []), result.data],
-          };
-        }));
-        return { success: true, data: result.data };
-      } else {
-        return { success: false, error: result.error };
-      }
-    } catch (err) {
-      return { success: false, error: 'Failed to reply to comment' };
-    }
-  };
 
   return {
     comments,
     loading,
     error,
     fetchComments,
-    createComment: createCommentHandler,
+    createCommentHandler,
     updateComment: updateCommentHandler,
     deleteComment: deleteCommentHandler,
     likeComment: likeCommentHandler,
-    replyToComment: replyToCommentHandler,
+    replyToCommentHandler,
   };
 };
 

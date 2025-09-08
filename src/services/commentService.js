@@ -111,9 +111,9 @@ export const unlikeComment = async (commentId, reactionType) => {
   }
 };
 
-export const replyToComment = async (commentId, replyData) => {
+export const replyToComment = async (commentData) => {
   try {
-    const response = await commentsApi.replyToComment(commentId, replyData);
+    const response = await commentsApi.createComment(commentData);
     return {
       success: true,
       data: response.data,

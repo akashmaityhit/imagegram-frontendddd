@@ -47,16 +47,17 @@ const PostCard = ({
   const postId = post._id;
 
   // Comments hook bound to this post
-  const {
-    createComment,
-    updateComment,
-  } = useComments(postId);
+  // const {
+  //   comments,
+  //   createComment,
+  //   updateComment,
+  // } = useComments(postId, post.comments || []);
 
-  const handleCommentAdd = async (commentObj) => {
-    // Ensure payload contains the target post
-    const payload = { ...commentObj, commentableId: postId };
-    const response = await createComment(payload);
-  };
+  // const handleCommentAdd = async (commentObj) => {
+  //   // Ensure payload contains the target post
+  //   const payload = { ...commentObj, commentableId: postId };
+  //   await createComment(payload);
+  // };
 
   const handleToggleComments = async () => {
     const next = !showComments;
@@ -202,8 +203,7 @@ const PostCard = ({
           {showComments && (
             <CommentSection
               postId={postId}
-              comments={post.comments || []}
-              onCommentAdd={handleCommentAdd}
+              initialComments={post.comments}
             />
           )}
         </div>

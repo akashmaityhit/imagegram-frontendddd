@@ -1,67 +1,74 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Send, User, Reply } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import LikeButton from './LikeButton';
-import { cn } from '@/utils';
+import { useEffect, useState } from "react";
+import { Send, User, Reply } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import LikeButton from "./LikeButton";
+import { cn } from "@/utils";
+import { useComments } from "@/hooks";
 
-const CommentSection = ({  
-  comments = [], 
-  onCommentAdd,
-  className 
-}) => {
-  const [newComment, setNewComment] = useState('');
+const CommentSection = ({ postId, initialComments = [], className }) => {
+  const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState(null);
-  const [replyText, setReplyText] = useState('');
+  const [replyText, setReplyText] = useState("");
 
-  
+  const { comments, replyToCommentHandler, createCommentHandler } = useComments(postId, initialComments);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   console.log("comments:", comments);
+  // }, [comments]);
 
-  },[comments])
-
-  const handleAddComment = (e) => {
+  const handleAddComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
-    onCommentAdd?.({
+    const payload = {
       content: newComment,
-      onModel: 'Post'
-    });
-    setNewComment('');
+      commentableId: postId,
+      onModel: "Post",
+    };
+    await createCommentHandler(payload);
+    setNewComment("")
   };
 
-  const handleAddReply = (parentId) => {
+  const handleAddReply = async (commentId) => {
     if (!replyText.trim()) return;
 
-    onCommentAdd?.(postId, {
-      text: replyText,
-      parentId: parentId,
-    });
-    setReplyText('');
+    const payload = {
+      content: replyText,
+      commentableId: commentId,
+      onModel: "Comment",
+    };
+    await replyToCommentHandler(commentId, payload);
+
+    setReplyText("");
     setReplyingTo(null);
   };
 
   const handleLikeChange = (commentId, reactionType, isActive) => {
     // Handle comment like changes
-    console.log('Comment like changed:', commentId, reactionType, isActive);
+    console.log("Comment like changed:", commentId, reactionType, isActive);
   };
 
   const renderComment = (comment, isReply = false) => (
     <div key={comment._id} className={cn("space-y-2", isReply && "ml-8")}>
       <div className="flex items-start space-x-3">
         <Avatar className="w-8 h-8">
-          <AvatarImage src={comment.userId?.avatar} alt={comment.userId?.name} />
+          <AvatarImage
+            src={comment.userId?.avatar}
+            alt={comment.userId?.name}
+          />
           <AvatarFallback>
             <User className="w-4 h-4" />
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 space-y-1">
           <div className="flex items-center space-x-2">
-            <span className="font-semibold text-sm">{comment.userId?.username || 'Anonymous'}</span>
+            <span className="font-semibold text-sm">
+              {comment.userId?.username || "Anonymous"}
+            </span>
             <span className="text-xs text-muted-foreground">
               {new Date(comment.updatedAt).toLocaleDateString()}
             </span>
@@ -98,7 +105,9 @@ const CommentSection = ({
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
               className="flex-1"
-              onKeyPress={(e) => e.key === 'Enter' && handleAddReply(comment._id)}
+              onKeyPress={(e) =>
+                e.key === "Enter" && handleAddReply(comment._id)
+              }
             />
             <Button
               size="sm"
@@ -112,7 +121,7 @@ const CommentSection = ({
               size="sm"
               onClick={() => {
                 setReplyingTo(null);
-                setReplyText('');
+                setReplyText("");
               }}
             >
               Cancel
@@ -151,11 +160,7 @@ const CommentSection = ({
           onChange={(e) => setNewComment(e.target.value)}
           className="flex-1"
         />
-        <Button
-          type="submit"
-          size="sm"
-          disabled={!newComment.trim()}
-        >
+        <Button type="submit" size="sm" disabled={!newComment.trim()}>
           <Send className="w-4 h-4" />
         </Button>
       </form>
