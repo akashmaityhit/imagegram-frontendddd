@@ -9,7 +9,7 @@ export const setAuthToken = (token) => {
   expires.setTime(expires.getTime() + (1 * 24 * 60 * 60 * 1000)); // expires in 1 days
   
   // Set secure cookie
-  document.cookie = `${AUTH_TOKEN_COOKIE}=${token}; expires=${expires.toUTCString()}; path=/; SameSite=Strict; Secure`;
+  document.cookie = `${AUTH_TOKEN_COOKIE}=${token}; expires=${expires.toUTCString()}; path=/; SameSite=None; Secure`;
 };
 
 // Get auth token from cookie

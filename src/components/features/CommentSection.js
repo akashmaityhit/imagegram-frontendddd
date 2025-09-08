@@ -16,9 +16,6 @@ const CommentSection = ({ postId, initialComments = [], className }) => {
 
   const { comments, replyToCommentHandler, createCommentHandler } = useComments(postId, initialComments);
 
-  // useEffect(() => {
-  //   console.log("comments:", comments);
-  // }, [comments]);
 
   const handleAddComment = async (e) => {
     e.preventDefault();

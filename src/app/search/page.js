@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Search, Filter } from 'lucide-react';
-import Layout from '@/components/layout/Layout';
-import PostCard from '@/components/features/PostCard';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useAuth, usePosts } from '@/hooks';
+import { useState } from "react";
+import { Search, Filter } from "lucide-react";
+import Layout from "@/components/layout/Layout";
+import PostCard from "@/components/features/PostCard";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useAuth, usePosts } from "@/hooks";
 
 export default function SearchPage() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
   const { isAuthenticated } = useAuth();
@@ -20,11 +20,12 @@ export default function SearchPage() {
     if (!searchQuery.trim()) return;
 
     setHasSearched(true);
-    
+
     // Filter posts based on search query
-    const filtered = posts.filter(post => 
-      post.caption?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    const filtered = posts.filter(
+      (post) =>
+        post.caption?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredPosts(filtered);
   };
@@ -37,18 +38,13 @@ export default function SearchPage() {
     }
   };
 
-  const handleCommentAdd = (postId, comment) => {
-    console.log('Comment added:', postId, comment);
-  };
 
   return (
     <Layout>
       <div className="min-h-screen bg-background">
         <div className="max-w-2xl mx-auto py-8 px-4">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold gradient-text mb-2">
-              Discover
-            </h1>
+            <h1 className="text-3xl font-bold gradient-text mb-2">Discover</h1>
             <p className="text-muted-foreground">
               Find amazing posts and connect with creators
             </p>
@@ -67,7 +63,7 @@ export default function SearchPage() {
                 />
               </div>
               <Button type="submit" disabled={loading || !searchQuery.trim()}>
-                {loading ? 'Searching...' : 'Search'}
+                {loading ? "Searching..." : "Search"}
               </Button>
             </div>
           </form>
@@ -94,7 +90,8 @@ export default function SearchPage() {
                 <>
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-muted-foreground">
-                      Found {filteredPosts.length} result{filteredPosts.length !== 1 ? 's' : ''}
+                      Found {filteredPosts.length} result
+                      {filteredPosts.length !== 1 ? "s" : ""}
                     </p>
                     <Button variant="outline" size="sm">
                       <Filter className="w-4 h-4 mr-2" />
@@ -104,10 +101,9 @@ export default function SearchPage() {
                   <div className="space-y-8">
                     {filteredPosts.map((post) => (
                       <PostCard
-                        key={post.id}
+                        key={post._id}
                         post={post}
                         onLikeChange={handleLikeChange}
-                        onCommentAdd={handleCommentAdd}
                       />
                     ))}
                   </div>
@@ -124,7 +120,8 @@ export default function SearchPage() {
               </div>
               <h2 className="text-2xl font-bold mb-2">Start exploring</h2>
               <p className="text-muted-foreground">
-                Search for posts, captions, or descriptions to discover amazing content
+                Search for posts, captions, or descriptions to discover amazing
+                content
               </p>
             </div>
           )}
