@@ -8,8 +8,9 @@ export const setAuthToken = (token) => {
   const expires = new Date();
   expires.setTime(expires.getTime() + (1 * 24 * 60 * 60 * 1000)); // expires in 1 days
   
+  const encodedToken = encodeURIComponent(token);
   // Set secure cookie
-  document.cookie = `${AUTH_TOKEN_COOKIE}=${token}; expires=${expires.toUTCString()}; path=/; SameSite=None; Secure`;
+  document.cookie = `${AUTH_TOKEN_COOKIE}=${encodedToken}; expires=${expires.toUTCString()}; path=/; SameSite=None; Secure`;
 };
 
 // Get auth token from cookie

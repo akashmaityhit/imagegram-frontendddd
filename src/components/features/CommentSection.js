@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Send, User, Reply } from "lucide-react";
+import { Send, User, Reply, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,8 +14,21 @@ const CommentSection = ({ postId, initialComments = [], className }) => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState("");
 
-  const { comments, replyToCommentHandler, createCommentHandler } = useComments(postId, initialComments);
+  const { comments, replyToCommentHandler, createCommentHandler, fetchPaginatedComments, hasMore, loadMoreComments, loading } = useComments(postId, initialComments);
 
+  useEffect(() => {
+    const fetchInitial = async () => {
+      const payload = { onModel: "Post", commentableId: postId };
+      await fetchPaginatedComments(payload);
+    };
+
+    fetchInitial();
+  }, [postId, fetchPaginatedComments]);
+
+  const handleLoadMoreComments = async () => {
+    const payload = { onModel: "Post", commentableId: postId };
+    await loadMoreComments(payload);
+  }
 
   const handleAddComment = async (e) => {
     e.preventDefault();
@@ -146,6 +159,28 @@ const CommentSection = ({ postId, initialComments = [], className }) => {
           </p>
         ) : (
           comments.map((comment) => renderComment(comment))
+        )}
+
+
+        {/* Load More Comments Button */}
+        {hasMore && (
+          <div className="text-center py-8">
+            <Button
+              onClick={handleLoadMoreComments}
+              disabled={loading}
+              variant="outline"
+              className="w-full"
+            >
+              {loading ? (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                'See More Comments'
+              )}
+            </Button>
+          </div>
         )}
       </div>
 

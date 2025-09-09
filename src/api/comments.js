@@ -5,9 +5,9 @@ export const commentsApi = {
   createComment: (commentData) => 
     axiosInstance.post('/comments/comment', commentData),
 
-  // Get comments for a post
-  getPostComments: (postId, offset = 0, limit = 30) => 
-    axiosInstance.get(`/posts/${postId}/comments?offset=${offset}&limit=${limit}`),
+  // Get paginated comments for a post
+  getPaginatedComments: (onModel, commentableId, offset, limit) =>
+    axiosInstance.get(`/comments/${onModel}/${commentableId}?offset=${offset}&limit=${limit}`),
 
   // Update a comment
   updateComment: (commentId, commentData) => 
@@ -24,9 +24,5 @@ export const commentsApi = {
   // Unlike a comment
   unlikeComment: (commentId, reactionType) => 
     axiosInstance.delete(`/comments/${commentId}/like`, { data: { reactionType } }),
-
-  // Reply to a comment
-  replyToComment: (commentId, replyData) => 
-    axiosInstance.post(`/comments/${commentId}/reply`, replyData),
 };
 

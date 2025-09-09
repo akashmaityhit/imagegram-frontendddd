@@ -200,7 +200,7 @@ export default function LandingPage() {
             <span className="text-lg font-bold gradient-text">ImageGram</span>
           </div>
           <p className="text-gray-400">
-            © 2024 ImageGram. Share your world with the community.
+            © 2025 ImageGram. Share your world with the community.
           </p>
         </div>
       </footer>

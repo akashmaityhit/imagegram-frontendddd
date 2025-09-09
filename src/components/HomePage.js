@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
 import PostCard from '@/components/features/PostCard';
-import { useComments, usePosts } from '@/hooks';
+import { usePosts } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 
@@ -19,7 +19,7 @@ export default function HomePage() {
     likePost, 
     unlikePost 
   } = usePosts();
-  const { createComment } = useComments();
+
 
   const handleLikeChange = async (postId, reactionType, isActive) => {
     if (isActive) {

@@ -1,6 +1,7 @@
 import { getCurrentUser } from '@/utils';
 import { commentsApi } from '../api';
 
+// Create new comment for Post
 export const createComment = async (commentData) => {
   try {
 
@@ -21,12 +22,33 @@ export const createComment = async (commentData) => {
   }
 };
 
-export const getPostComments = async (postId, offset = 0, limit = 5) => {
+
+// Create reply comment for a Comment
+export const replyToComment = async (commentData) => {
   try {
-    const response = await commentsApi.getPostComments(postId, offset, limit);
+    const response = await commentsApi.createComment(commentData);
     return {
       success: true,
       data: response.data,
+      error: null,
+    };
+  } catch (error) {
+    console.error('Error replying to comment:', error);
+    return {
+      success: false,
+      data: null,
+      error: error.message,
+    };
+  }
+};
+
+
+export const getPostComments = async (onModel, commentableId, offset, limit) => {
+  try {
+    const response = await commentsApi.getPaginatedComments(onModel, commentableId, offset, limit);
+    return {
+      success: true,
+      data: response.data || [],
       error: null,
     };
   } catch (error) {
@@ -111,21 +133,4 @@ export const unlikeComment = async (commentId, reactionType) => {
   }
 };
 
-export const replyToComment = async (commentData) => {
-  try {
-    const response = await commentsApi.createComment(commentData);
-    return {
-      success: true,
-      data: response.data,
-      error: null,
-    };
-  } catch (error) {
-    console.error('Error replying to comment:', error);
-    return {
-      success: false,
-      data: null,
-      error: error.message,
-    };
-  }
-};
 

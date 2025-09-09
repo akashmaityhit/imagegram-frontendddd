@@ -23,7 +23,6 @@ import { useComments } from '@/hooks';
 const PostCard = ({ 
   post, 
   onLikeChange, 
-  onCommentAdd,
   className,
   showOwnerActions = false,
   currentUserId,
@@ -42,30 +41,13 @@ const PostCard = ({
     onLikeChange?.(postId, reactionType, isActive);
   };
 
+
   
-
   const postId = post._id;
-
-  // Comments hook bound to this post
-  // const {
-  //   comments,
-  //   createComment,
-  //   updateComment,
-  // } = useComments(postId, post.comments || []);
-
-  // const handleCommentAdd = async (commentObj) => {
-  //   // Ensure payload contains the target post
-  //   const payload = { ...commentObj, commentableId: postId };
-  //   await createComment(payload);
-  // };
 
   const handleToggleComments = async () => {
     const next = !showComments;
     setShowComments(next);
-    if (next) {
-      // Fetch comments when opening the section
-      // await fetchComments();
-    }
   };
 
   const handleEditSubmit = async (e) => {
@@ -203,7 +185,7 @@ const PostCard = ({
           {showComments && (
             <CommentSection
               postId={postId}
-              initialComments={post.comments}
+              initialComments={[]}
             />
           )}
         </div>
