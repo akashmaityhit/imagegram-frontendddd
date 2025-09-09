@@ -146,7 +146,7 @@ const PostCard = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <LikeButton
-                postId={post.id}
+                postId={post._id}
                 initialReactions={post.reactions || {}}
                 onReactionChange={handleLikeChange}
               />

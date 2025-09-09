@@ -1,16 +1,26 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getPosts, createPost, updatePost, deletePost, likePost, unlikePost } from '../services';
+import { getALLPosts, createPost, updatePost, deletePost, likePost, unlikePost, getPostsMadeByUser } from '../services';
 
-export const usePosts = (initialOffset = 0, initialLimit = 10) => {
+export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchPosts = useCallback(async (offset = initialOffset, limit = initialLimit) => {
+  const fetchPosts = useCallback(async (userId, offset = initialOffset, limit = initialLimit) => {
     try {
       setLoading(true);
-      const result = await getPosts(offset, limit);
+
+      let result;
+
+      console.log("id:;", userId)
+
+      if(userId){
+        result = await getPostsMadeByUser(userId, offset, limit)
+        // console.log("response from postmade user:", result.data)
+      } else {
+        result = await getALLPosts(offset, limit);
+      }
       
       if (result.success) {
         setPosts(result.data.posts);
@@ -32,7 +42,7 @@ export const usePosts = (initialOffset = 0, initialLimit = 10) => {
     
     try {
       setLoading(true);
-      const result = await getPosts(posts.length, initialLimit);
+      const result = await getALLPosts(posts.length, initialLimit);
       
       if (result.success) {
         setPosts(prev => [...prev, ...result.data.posts]);
@@ -144,8 +154,8 @@ export const usePosts = (initialOffset = 0, initialLimit = 10) => {
   };
 
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    fetchPosts(userId);
+  }, [fetchPosts, userId]);
 
   return {
     posts,

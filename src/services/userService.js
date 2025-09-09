@@ -1,5 +1,5 @@
 import { usersApi } from '../api';
-import { demoUser } from '../constants/demoData';
+
 
 export const createUser = async (userData) => {
   try {
@@ -91,7 +91,7 @@ export const updateUserProfile = async (userId, userData) => {
   }
 };
 
-export const getUserPosts = async (userId, offset = 0, limit = 30) => {
+export const getUserPosts = async (userId, offset = 0, limit = 5) => {
   try {
     const response = await usersApi.getUserPosts(userId, offset, limit);
     return {

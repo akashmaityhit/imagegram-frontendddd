@@ -1,9 +1,9 @@
 import { getCurrentUser } from '@/utils';
 import { postsApi } from '../api';
 
-export const getPosts = async (offset = 0, limit = 5) => {
+export const getALLPosts = async (offset = 0, limit = 5) => {
   try {
-    const response = await postsApi.getPosts(offset, limit);
+    const response = await postsApi.getAllPosts(offset, limit);
 
     return {
       success: true,
@@ -19,6 +19,26 @@ export const getPosts = async (offset = 0, limit = 5) => {
     };
   }
 };
+
+export const getPostsMadeByUser = async (userId, offset = 0, limit = 5) => {
+  try {
+    const response = await postsApi.getPostsMadeByUser(userId, offset, limit);
+
+    return {
+      success: true,
+      data: response.data,
+      error: null,
+    };
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    return {
+      success: false,
+      data: null,
+      error: error.message,
+    };
+  }
+};
+
 
 export const createPost = async (postData) => {
   try {

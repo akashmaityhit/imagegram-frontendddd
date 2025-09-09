@@ -2,8 +2,11 @@ import axiosInstance from './client';
 
 export const postsApi = {
   // Get posts with pagination
-  getPosts: (offset = 0, limit = 30) => 
+  getAllPosts: (offset = 0, limit = 10) => 
     axiosInstance.get(`/posts?offset=${offset}&limit=${limit}`),
+
+  getPostsMadeByUser: (userId, offset = 0, limit = 10 ) => 
+    axiosInstance.get(`/posts/user/${userId}?offset=${offset}&limit=${limit}`),
 
   // Create a new post
   createPost: (postData) => {
