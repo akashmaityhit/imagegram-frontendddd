@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { createComment, getPostComments, updateComment, deleteComment, likeComment, unlikeComment, replyToComment, getUserProfile } from '../services';
 
 export const useUser = (userId) => {
@@ -25,6 +25,11 @@ export const useUser = (userId) => {
       setLoading(false);
     }
   }, []);
+
+
+  useEffect(() => {
+    fetchUserDetails(userId);
+  }, [fetchUserDetails, userId]);
 
 
   return {

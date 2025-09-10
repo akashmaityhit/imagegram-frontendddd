@@ -11,16 +11,10 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
     try {
       setLoading(true);
 
-      let result;
+      let result = userId 
+        ? await getPostsMadeByUser(userId, offset, initialLimit)
+        : await getALLPosts(offset, limit);
 
-      console.log("id:;", userId)
-
-      if(userId){
-        result = await getPostsMadeByUser(userId, offset, limit)
-        // console.log("response from postmade user:", result.data)
-      } else {
-        result = await getALLPosts(offset, limit);
-      }
       
       if (result.success) {
         setPosts(result.data.posts);
@@ -39,17 +33,22 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
 
   const loadMorePosts = async () => {
     if (loading || !hasMore) return;
-    
+
     try {
       setLoading(true);
-      const result = await getALLPosts(posts.length, initialLimit);
-      
+      const offset = posts.length;
+      const result = userId
+        ? await getPostsMadeByUser(userId, offset, initialLimit)
+        : await getALLPosts(offset, initialLimit);
+
       if (result.success) {
         setPosts(prev => [...prev, ...result.data.posts]);
-        setHasMore(result.data.totalDocuments > posts.length + initialLimit);
+        const totalDocuments = result.data.totalDocuments ?? 0;
+        const accumulatedCount = offset + (result.data.posts?.length ?? 0);
+        setHasMore(accumulatedCount < totalDocuments);
       }
     } catch (err) {
-      console.error('Error loading more posts:', err);
+      setError('Failed to fetch more posts');
     } finally {
       setLoading(false);
     }
@@ -75,7 +74,7 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
       if (result.success) {
         setPosts(prev => 
           prev.map(post => 
-            post.id === postId ? { ...post, ...result.data } : post
+            post._id === postId ? { ...post, ...result.data } : post
           )
         );
         return { success: true, data: result.data };
@@ -91,7 +90,12 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
     try {
       const result = await deletePost(postId);
       if (result.success) {
-        setPosts(prev => prev.filter(post => post.id !== postId));
+        setPosts(prev => prev.filter(post => post._id !== postId));
+        
+        const totalDocuments = result.data.totalDocuments || 0;
+        const accumulatedCount = offset + (result.data.posts?.length || 0);
+        setHasMore(accumulatedCount < totalDocuments);
+
         return { success: true };
       } else {
         return { success: false, error: result.error };
@@ -107,7 +111,7 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
       if (result.success) {
         setPosts(prev => 
           prev.map(post => 
-            post.id === postId 
+            post._id === postId 
               ? {
                   ...post,
                   reactions: {
@@ -133,7 +137,7 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
       if (result.success) {
         setPosts(prev => 
           prev.map(post => 
-            post.id === postId 
+            post._id === postId 
               ? {
                   ...post,
                   reactions: {

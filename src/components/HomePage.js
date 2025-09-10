@@ -7,6 +7,7 @@ import PostCard from '@/components/features/PostCard';
 import { usePosts } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function HomePage() {
   const { 
@@ -19,6 +20,20 @@ export default function HomePage() {
     likePost, 
     unlikePost 
   } = usePosts();
+
+  const PostsLoadingSkeleton = () => (
+    <div className="space-y-8">
+      {[...Array(2)].map((_, i) => (
+        <Card key={i} className="overflow-hidden">
+          <div className="w-full aspect-square bg-muted animate-pulse" />
+          <div className="p-4 space-y-2">
+            <div className="h-4 w-1/3 bg-muted rounded" />
+            <div className="h-3 w-2/3 bg-muted rounded" />
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
 
 
   const handleLikeChange = async (postId, reactionType, isActive) => {
@@ -39,10 +54,7 @@ export default function HomePage() {
       <Layout>
         <div className="min-h-screen bg-background">
           <div className="max-w-2xl mx-auto py-8 px-4">
-            <div className="text-center py-12">
-              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-muted-foreground">Loading posts...</p>
-            </div>
+            <PostsLoadingSkeleton />
           </div>
         </div>
       </Layout>

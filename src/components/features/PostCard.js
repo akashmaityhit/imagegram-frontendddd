@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { updatePost, deletePost } from '@/services';
+import { updatePost } from '@/services';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LikeButton from './LikeButton';
 import CommentSection from './CommentSection';
@@ -26,6 +26,7 @@ const PostCard = ({
   className,
   showOwnerActions = false,
   currentUserId,
+  onDelete,
 }) => {
   const [showComments, setShowComments] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -70,8 +71,8 @@ const PostCard = ({
   const handleDelete = async () => {
     try {
       setIsSubmitting(true);
-      const result = await deletePost(postId);
-      if (result?.success) {
+      const result = await onDelete?.(postId);
+      if (result?.success || result === true) {
         setIsDeleteOpen(false);
         setIsMenuOpen(false);
       }

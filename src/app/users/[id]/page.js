@@ -1,17 +1,62 @@
 "use client";
 
-import { Suspense, use, useEffect } from "react";
+import { use } from "react";
 import Layout from "@/components/layout/Layout";
 import PostCard from "@/components/features/PostCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar, Mail, User, Camera, Loader2, RefreshCw } from "lucide-react";
+import { Calendar, Mail, User, Camera, RefreshCw } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
-import { usePosts } from "@/hooks";
-import { getCurrentUser } from "@/utils";
+import { useAuth, usePosts } from "@/hooks";
 import { Button } from "@/components/ui/button";
 
-function ProfileSection({ user }) {
+function UserLoadingSkeleton() {
+  return (
+    <Card className="mb-8">
+      <CardContent className="p-6 animate-pulse">
+        <div className="flex items-start justify-between mb-6">
+          <div className="flex items-center space-x-4 w-full">
+            <div className="w-20 h-20 rounded-full bg-muted" />
+            <div className="flex-1 space-y-2">
+              <div className="h-5 bg-muted rounded w-1/3" />
+              <div className="h-4 bg-muted rounded w-1/4" />
+              <div className="h-3 bg-muted rounded w-2/3" />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="h-12 bg-muted rounded" />
+          <div className="h-12 bg-muted rounded" />
+          <div className="h-12 bg-muted rounded" />
+        </div>
+
+        <div className="space-y-2">
+          <div className="h-4 bg-muted rounded w-1/3" />
+          <div className="h-4 bg-muted rounded w-1/4" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PostsLoadingSkeleton() {
+  return (
+    <div className="space-y-8">
+      {[...Array(2)].map((_, i) => (
+        <Card key={i} className="overflow-hidden">
+          <div className="w-full aspect-square bg-muted animate-pulse" />
+          <div className="p-4 space-y-2">
+            <div className="h-4 w-1/3 bg-muted rounded" />
+            <div className="h-3 w-2/3 bg-muted rounded" />
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function ProfileSection({ user, isOwner }) {
   return (
     <Card className="mb-8">
       <CardContent className="p-6">
@@ -33,6 +78,11 @@ function ProfileSection({ user }) {
               )}
             </div>
           </div>
+          {isOwner && (
+            <Button variant="outline" size="sm">
+              Edit Profile
+            </Button>
+          )}
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-6">
@@ -75,7 +125,14 @@ function ProfileSection({ user }) {
   );
 }
 
-function PostsSection({ posts = [], currentUser }) {
+function PostsSection({
+  posts = [],
+  currentUser,
+  hasMore,
+  loadMorePosts,
+  onDelete,
+  postLoading,
+}) {
   if (posts?.length === 0) {
     return (
       <Card>
@@ -98,8 +155,30 @@ function PostsSection({ posts = [], currentUser }) {
           post={post}
           showOwnerActions={true}
           currentUserId={currentUser?._id}
+          onDelete={onDelete}
         />
       ))}
+
+      {/* Load More Button */}
+      {hasMore && (
+        <div className="text-center py-8">
+          <Button
+            onClick={loadMorePosts}
+            disabled={postLoading}
+            variant="outline"
+            className="w-full"
+          >
+            {postLoading ? (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              "Load More Posts"
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -108,43 +187,17 @@ export default function UserPage({ params }) {
   const { id } = use(params);
   const userId = id;
 
-  const {
-    fetchUserDetails,
-    loading: userLoading,
-    error: userError,
-    user,
-  } = useUser(userId);
+  const { loading: userLoading, error: userError, user } = useUser(userId);
   const {
     posts,
     hasMore,
-    fetchPosts,
     loadMorePosts,
     loading: postLoading,
     error: postError,
+    deletePost,
   } = usePosts(userId);
 
-  const currentUser = getCurrentUser();
-
-  useEffect(() => {
-    if (!userId) return;
-    fetchUserDetails(userId);
-    fetchPosts(userId);
-  }, [userId, fetchUserDetails, fetchPosts]);
-
-  // Show a centered spinner only when both user and posts are loading
-  if (userLoading) {
-    return (
-      <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto"></div>
-            <p className="mt-2 text-gray-300">Loading...</p>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
+  const { user: currentUser } = useAuth();
   return (
     <Layout>
       <div className="min-h-screen bg-background">
@@ -155,45 +208,36 @@ export default function UserPage({ params }) {
                 <p className="text-sm text-red-500">No user found</p>
               </CardContent>
             </Card>
-          ) : !userLoading ? (
-            <ProfileSection user={user} />
-          ) : null}
+          ) : userLoading ? (
+            <UserLoadingSkeleton />
+          ) : (
+            <ProfileSection user={user} isOwner={user?._id && currentUser?._id ? user._id === currentUser._id : false} />
+          )}
 
           <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Posts</h2>
-            </div>
             {postError ? (
               <Card>
                 <CardContent className="p-6">
                   <p className="text-sm text-red-500">No posts</p>
                 </CardContent>
               </Card>
-            ) : !postLoading ? (
+            ) : postLoading ? (
+              <PostsLoadingSkeleton />
+            ) : (
               <>
-                <PostsSection posts={posts} currentUser={currentUser} />
-                {/* Load More Button */}
-                {hasMore && (
-                  <div className="text-center py-8">
-                    <Button
-                      onClick={loadMorePosts}
-                      disabled={postLoading}
-                      variant="outline"
-                      className="w-full"
-                    >
-                      {postLoading ? (
-                        <>
-                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                          Loading...
-                        </>
-                      ) : (
-                        "Load More Posts"
-                      )}
-                    </Button>
-                  </div>
-                )}
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold">Posts</h2>
+                </div>
+                <PostsSection
+                  posts={posts}
+                  currentUser={currentUser}
+                  onDelete={deletePost}
+                  hasMore={hasMore}
+                  loadMorePosts={loadMorePosts}
+                  postLoading={postLoading}
+                />
               </>
-            ) : null}
+            )}
           </div>
         </div>
       </div>

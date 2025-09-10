@@ -29,7 +29,7 @@ const Navigation = () => {
     { href: '/upload', icon: Plus, label: 'Upload' },
     { href: '/search', icon: Search, label: 'Search' },
     { href: '/activity', icon: Heart, label: 'Activity' },
-    { href: '/profile', icon: User, label: 'Profile' },
+    { href: user?._id ? `/users/${user._id}` : '/profile', icon: User, label: 'Profile' },
   ];
 
   const onSignout = () => {
