@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks";
 import { useUser } from "@/hooks/useUser";
 import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function SearchPage() {
@@ -61,9 +62,21 @@ export default function SearchPage() {
           {hasSearched && (
             <div className="space-y-6">
               {usersLoading ? (
-                <div className="text-center py-8">
-                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                  <p>Searching...</p>
+                <div className="space-y-3">
+                  {[...Array(2)].map((_, i) => (
+                    <Card key={i} className="bg-card/70 border-border/50">
+                      <CardContent className="p-4">
+                        <div className="flex items-center space-x-3 animate-pulse">
+                          <div className="w-10 h-10 rounded-full bg-muted" />
+                          <div className="flex-1 space-y-2">
+                            <div className="h-4 w-1/3 bg-muted rounded" />
+                            <div className="h-3 w-1/4 bg-muted rounded" />
+                          </div>
+                          <div className="h-8 w-24 bg-muted rounded" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               ) : (userList?.length || 0) === 0 ? (
                 <div className="text-center py-12">
@@ -76,19 +89,12 @@ export default function SearchPage() {
                   </p>
                 </div>
               ) : (
-                <>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-semibold">Users</h2>
-                    </div>
-                    <div className="space-y-3">
-                      {userList?.map((u) => (
-                        <Link
-                          key={u._id}
-                          href={`/users/${u._id}`}
-                          className="block"
-                        >
-                          <div className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent transition-colors">
+                <div className="space-y-3">
+                  {userList?.map((u) => (
+                    <Link key={u._id} href={`/users/${u._id}`} className="block">
+                      <Card className="bg-card/70 border-border/50 hover:bg-accent transition-colors">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
                               <Avatar className="w-10 h-10">
                                 <AvatarImage src={u.avatar} alt={u.username} />
@@ -103,12 +109,13 @@ export default function SearchPage() {
                                 </div>
                               </div>
                             </div>
+                            <Button variant="secondary" size="sm">View</Button>
                           </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
               )}
             </div>
           )}
