@@ -1,5 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getALLPosts, createPost, updatePost, deletePost, likePost, unlikePost, getPostsMadeByUser } from '../services';
+import { useState, useEffect, useCallback } from "react";
+import {
+  getALLPosts,
+  createPost,
+  updatePost,
+  deletePost,
+  likePost,
+  unlikePost,
+  getPostsMadeByUser,
+} from "@/services/postService";
 
 export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
   const [posts, setPosts] = useState([]);
@@ -7,29 +15,31 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
   const [error, setError] = useState(null);
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchPosts = useCallback(async (userId, offset = initialOffset, limit = initialLimit) => {
-    try {
-      setLoading(true);
+  const fetchPosts = useCallback(
+    async (userId, offset = initialOffset, limit = initialLimit) => {
+      try {
+        setLoading(true);
 
-      let result = userId 
-        ? await getPostsMadeByUser(userId, offset, initialLimit)
-        : await getALLPosts(offset, limit);
+        let result = userId
+          ? await getPostsMadeByUser(userId, offset, initialLimit)
+          : await getALLPosts(offset, limit);
 
-      
-      if (result.success) {
-        setPosts(result.data.posts);
-        setError(null);
-        setHasMore(result.data.totalDocuments > result.data.posts.length);
-      } else {
-        setError(result.error.message);
+        if (result.success) {
+          setPosts(result.data.posts);
+          setError(null);
+          setHasMore(result.data.totalDocuments > result.data.posts.length);
+        } else {
+          setError(result.error.message);
+        }
+      } catch (err) {
+        setError("Failed to fetch posts");
+        console.error("Error fetching posts:", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError('Failed to fetch posts');
-      console.error('Error fetching posts:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [initialOffset, initialLimit]);
+    },
+    [initialOffset, initialLimit]
+  );
 
   const loadMorePosts = async () => {
     if (loading || !hasMore) return;
@@ -42,13 +52,13 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
         : await getALLPosts(offset, initialLimit);
 
       if (result.success) {
-        setPosts(prev => [...prev, ...result.data.posts]);
+        setPosts((prev) => [...prev, ...result.data.posts]);
         const totalDocuments = result.data.totalDocuments ?? 0;
         const accumulatedCount = offset + (result.data.posts?.length ?? 0);
         setHasMore(accumulatedCount < totalDocuments);
       }
     } catch (err) {
-      setError('Failed to fetch more posts');
+      setError("Failed to fetch more posts");
     } finally {
       setLoading(false);
     }
@@ -58,13 +68,13 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
     try {
       const result = await createPost(postData);
       if (result.success) {
-        setPosts(prev => [result.data, ...prev]);
+        setPosts((prev) => [result.data, ...prev]);
         return { success: true, data: result.data };
       } else {
         return { success: false, error: result.error };
       }
     } catch (err) {
-      return { success: false, error: 'Failed to create post' };
+      return { success: false, error: "Failed to create post" };
     }
   };
 
@@ -72,8 +82,8 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
     try {
       const result = await updatePost(postId, postData);
       if (result.success) {
-        setPosts(prev => 
-          prev.map(post => 
+        setPosts((prev) =>
+          prev.map((post) =>
             post._id === postId ? { ...post, ...result.data } : post
           )
         );
@@ -82,7 +92,7 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
         return { success: false, error: result.error };
       }
     } catch (err) {
-      return { success: false, error: 'Failed to update post' };
+      return { success: false, error: "Failed to update post" };
     }
   };
 
@@ -90,8 +100,8 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
     try {
       const result = await deletePost(postId);
       if (result.success) {
-        setPosts(prev => prev.filter(post => post._id !== postId));
-        
+        setPosts((prev) => prev.filter((post) => post._id !== postId));
+
         const totalDocuments = result.data.totalDocuments || 0;
         const accumulatedCount = offset + (result.data.posts?.length || 0);
         setHasMore(accumulatedCount < totalDocuments);
@@ -101,7 +111,7 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
         return { success: false, error: result.error };
       }
     } catch (err) {
-      return { success: false, error: 'Failed to delete post' };
+      return { success: false, error: "Failed to delete post" };
     }
   };
 
@@ -109,15 +119,15 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
     try {
       const result = await likePost(postId, reactionType);
       if (result.success) {
-        setPosts(prev => 
-          prev.map(post => 
-            post._id === postId 
+        setPosts((prev) =>
+          prev.map((post) =>
+            post._id === postId
               ? {
                   ...post,
                   reactions: {
                     ...post.reactions,
-                    [reactionType]: (post.reactions[reactionType] || 0) + 1
-                  }
+                    [reactionType]: (post.reactions[reactionType] || 0) + 1,
+                  },
                 }
               : post
           )
@@ -127,7 +137,7 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
         return { success: false, error: result.error };
       }
     } catch (err) {
-      return { success: false, error: 'Failed to like post' };
+      return { success: false, error: "Failed to like post" };
     }
   };
 
@@ -135,15 +145,18 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
     try {
       const result = await unlikePost(postId, reactionType);
       if (result.success) {
-        setPosts(prev => 
-          prev.map(post => 
-            post._id === postId 
+        setPosts((prev) =>
+          prev.map((post) =>
+            post._id === postId
               ? {
                   ...post,
                   reactions: {
                     ...post.reactions,
-                    [reactionType]: Math.max((post.reactions[reactionType] || 0) - 1, 0)
-                  }
+                    [reactionType]: Math.max(
+                      (post.reactions[reactionType] || 0) - 1,
+                      0
+                    ),
+                  },
                 }
               : post
           )
@@ -153,7 +166,7 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
         return { success: false, error: result.error };
       }
     } catch (err) {
-      return { success: false, error: 'Failed to unlike post' };
+      return { success: false, error: "Failed to unlike post" };
     }
   };
 
@@ -175,4 +188,3 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
     unlikePost: unlikePostHandler,
   };
 };
-

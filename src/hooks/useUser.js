@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { createComment, getPostComments, updateComment, deleteComment, likeComment, unlikeComment, replyToComment, getUserProfile } from '../services';
+import { getUserProfile } from "@/services/userService";
+import { useCallback, useEffect, useState } from "react";
 
 export const useUser = (userId) => {
   const [user, setUser] = useState(null);
@@ -19,24 +19,21 @@ export const useUser = (userId) => {
         setError(result.error);
       }
     } catch (err) {
-      setError('Failed to fetch user details');
-      console.error('Error fetching user details:', err);
+      setError("Failed to fetch user details");
+      console.error("Error fetching user details:", err);
     } finally {
       setLoading(false);
     }
   }, []);
 
-
   useEffect(() => {
     fetchUserDetails(userId);
   }, [fetchUserDetails, userId]);
-
 
   return {
     user,
     loading,
     error,
-    fetchUserDetails
+    fetchUserDetails,
   };
 };
-

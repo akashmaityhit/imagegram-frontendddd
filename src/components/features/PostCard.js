@@ -13,12 +13,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { updatePost } from '@/services';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LikeButton from './LikeButton';
 import CommentSection from './CommentSection';
 import { cn } from '@/utils';
-import { useComments } from '@/hooks';
+import { useComments, usePosts } from '@/hooks';
 
 const PostCard = ({ 
   post, 
@@ -37,14 +36,17 @@ const PostCard = ({
   const [caption, setCaption] = useState(post.caption || '');
   const [description, setDescription] = useState(post.description || '');
 
+
+  const postId = post._id;
+
+  const { updatePost } = usePosts();
+
   const handleLikeChange = (postId, reactionType, isActive) => {
     setIsLiked(isActive);
     onLikeChange?.(postId, reactionType, isActive);
   };
 
 
-  
-  const postId = post._id;
 
   const handleToggleComments = async () => {
     const next = !showComments;

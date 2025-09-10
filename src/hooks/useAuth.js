@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { authService } from '../services/authService';
 import { isAuthenticated, getCurrentUser, signOut } from '../utils/auth';
+import { authService } from '@/services/authService';
 
 /**
  * Custom hook for authentication management
