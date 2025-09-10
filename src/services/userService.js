@@ -46,7 +46,6 @@ export const getUserProfile = async (userId) => {
       error: null,
     };
   } catch (error) {
-    console.error('Error fetching user profile:', error);
     return {
       success: false,
       data: null,

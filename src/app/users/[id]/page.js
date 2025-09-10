@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar, Mail, User, Camera } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 import { usePosts } from "@/hooks";
+import { getCurrentUser } from "@/utils";
 
 function ProfileSkeleton() {
   return (
@@ -111,8 +112,7 @@ function ProfileSection({ user }) {
   );
 }
 
-function PostsSection({ posts = []}) {
-  console.log("posts:",posts)
+function PostsSection({ posts = [], currentUser}) {
   if (posts?.length === 0) {
     return (
       <Card>
@@ -133,8 +133,8 @@ function PostsSection({ posts = []}) {
         <PostCard
           key={post._id}
           post={post}
-          // showOwnerActions={true}
-          // currentUserId={"68bc29e9e52a484c845d97fc"}
+          showOwnerActions={true}
+          currentUserId={currentUser?._id}
         />
       ))}
     </div>
@@ -147,6 +147,8 @@ export default function UserPage({ params }) {
 
   const { fetchUserDetails, loading: userLoading, error: userError, user } = useUser(userId);
   const { fetchPosts, posts, loading: postLoading, error: postError } = usePosts(userId);
+
+  const currentUser = getCurrentUser();
 
   useEffect(() => {
     if (!userId) return;
@@ -166,7 +168,7 @@ export default function UserPage({ params }) {
           ) : userError ? (
             <Card className="mb-8">
               <CardContent className="p-6">
-                <p className="text-sm text-red-500">{userError}</p>
+                <p className="text-sm text-red-500">No user found</p>
               </CardContent>
             </Card>
           ) : (
@@ -182,11 +184,11 @@ export default function UserPage({ params }) {
             ) : postError ? (
               <Card>
                 <CardContent className="p-6">
-                  <p className="text-sm text-red-500">{postError}</p>
+                  <p className="text-sm text-red-500">No posts</p>
                 </CardContent>
               </Card>
             ) : (
-              <PostsSection posts={posts} />
+              <PostsSection posts={posts} currentUser={currentUser}/>
             )}
           </div>
         </div>

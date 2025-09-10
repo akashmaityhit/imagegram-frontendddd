@@ -15,6 +15,7 @@ export const useUser = (userId) => {
         setUser(result.data.user);
         setError(null);
       } else {
+        console.log(result);
         setError(result.error);
       }
     } catch (err) {

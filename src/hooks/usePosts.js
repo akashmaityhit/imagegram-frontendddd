@@ -27,7 +27,7 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
         setError(null);
         setHasMore(result.data.totalDocuments > result.data.posts.length);
       } else {
-        setError(result.error);
+        setError(result.error.message);
       }
     } catch (err) {
       setError('Failed to fetch posts');

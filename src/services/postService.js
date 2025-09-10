@@ -30,7 +30,6 @@ export const getPostsMadeByUser = async (userId, offset = 0, limit = 5) => {
       error: null,
     };
   } catch (error) {
-    console.error('Error fetching posts:', error);
     return {
       success: false,
       data: null,
