@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Filter } from "lucide-react";
+import { Search } from "lucide-react";
 import Layout from "@/components/layout/Layout";
-import PostCard from "@/components/features/PostCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useAuth, usePosts } from "@/hooks";
+import { useAuth } from "@/hooks";
+import { useUser } from "@/hooks/useUser";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredPosts, setFilteredPosts] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
-  const { isAuthenticated } = useAuth();
-  const { posts, loading, likePost, unlikePost } = usePosts();
+  const { searchUsers, userList, loading: usersLoading } = useUser();
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -21,23 +21,9 @@ export default function SearchPage() {
 
     setHasSearched(true);
 
-    // Filter posts based on search query
-    const filtered = posts.filter(
-      (post) =>
-        post.caption?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredPosts(filtered);
+    // Fetch matching users from backend
+    await searchUsers(searchQuery);
   };
-
-  const handleLikeChange = async (postId, reactionType, isActive) => {
-    if (isActive) {
-      await likePost(postId, reactionType);
-    } else {
-      await unlikePost(postId, reactionType);
-    }
-  };
-
 
   return (
     <Layout>
@@ -56,14 +42,17 @@ export default function SearchPage() {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
-                  placeholder="Search posts, captions, or descriptions..."
+                  placeholder="Search users by username or name..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
               </div>
-              <Button type="submit" disabled={loading || !searchQuery.trim()}>
-                {loading ? "Searching..." : "Search"}
+              <Button
+                type="submit"
+                disabled={usersLoading || !searchQuery.trim()}
+              >
+                {usersLoading ? "Searching..." : "Search"}
               </Button>
             </div>
           </form>
@@ -71,41 +60,53 @@ export default function SearchPage() {
           {/* Search results */}
           {hasSearched && (
             <div className="space-y-6">
-              {loading ? (
+              {usersLoading ? (
                 <div className="text-center py-8">
                   <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                   <p>Searching...</p>
                 </div>
-              ) : filteredPosts.length === 0 ? (
+              ) : (userList?.length || 0) === 0 ? (
                 <div className="text-center py-12">
                   <div className="w-24 h-24 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
                     <Search className="w-12 h-12 text-muted-foreground" />
                   </div>
-                  <h2 className="text-2xl font-bold mb-2">No results found</h2>
+                  <h2 className="text-2xl font-bold mb-2">No users found</h2>
                   <p className="text-muted-foreground">
-                    Try searching with different keywords
+                    Try a different name or username
                   </p>
                 </div>
               ) : (
                 <>
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      Found {filteredPosts.length} result
-                      {filteredPosts.length !== 1 ? "s" : ""}
-                    </p>
-                    <Button variant="outline" size="sm">
-                      <Filter className="w-4 h-4 mr-2" />
-                      Filter
-                    </Button>
-                  </div>
-                  <div className="space-y-8">
-                    {filteredPosts.map((post) => (
-                      <PostCard
-                        key={post._id}
-                        post={post}
-                        onLikeChange={handleLikeChange}
-                      />
-                    ))}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-semibold">Users</h2>
+                    </div>
+                    <div className="space-y-3">
+                      {userList?.map((u) => (
+                        <Link
+                          key={u._id}
+                          href={`/users/${u._id}`}
+                          className="block"
+                        >
+                          <div className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent transition-colors">
+                            <div className="flex items-center space-x-3">
+                              <Avatar className="w-10 h-10">
+                                <AvatarImage src={u.avatar} alt={u.username} />
+                                <AvatarFallback>
+                                  {u.username?.[0]?.toUpperCase() || "U"}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <div className="font-medium">{u.username}</div>
+                                <div className="text-sm text-muted-foreground">
+                                  {u.fullName || u.username}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </>
               )}

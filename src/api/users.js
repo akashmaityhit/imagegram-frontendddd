@@ -25,6 +25,10 @@ export const usersApi = {
   getUserPosts: (userId, offset = 0, limit = 30) => 
     axiosInstance.get(`/users/${userId}/posts?offset=${offset}&limit=${limit}`),
 
+  // Search users by query (username or name)
+  searchUsers: (query, offset = 0, limit = 10) =>
+    axiosInstance.get(`/users?search=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`),
+
   // Follow a user
   followUser: (userId) => 
     axiosInstance.post(`/users/${userId}/follow`),

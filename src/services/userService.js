@@ -108,6 +108,23 @@ export const getUserPosts = async (userId, offset = 0, limit = 5) => {
   }
 };
 
+export const searchUsers = async (query, offset = 0, limit = 10) => {
+  try {
+    const response = await usersApi.searchUsers(query, offset, limit);
+    return {
+      success: true,
+      data: response.data,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      data: null,
+      error: error.message,
+    };
+  }
+};
+
 export const followUser = async (userId) => {
   try {
     const response = await usersApi.followUser(userId);
