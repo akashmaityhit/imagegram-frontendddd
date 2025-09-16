@@ -11,16 +11,13 @@ import { useAuth, usePosts } from '@/hooks';
 
 export default function ProfilePage() {
   const { user, loading: userLoading } = useAuth();
-  const { posts, loading: postsLoading, likePost, unlikePost } = usePosts();
+  const { posts, loading: postsLoading, handleReactionChange, updatePost, deletePost } = usePosts();
 
   const userPosts = posts?.filter(post => post.user?._id === user._id);
 
-  const handleLikeChange = async (postId, reactionType, isActive) => {
-    if (isActive) {
-      await likePost(postId, reactionType);
-    } else {
-      await unlikePost(postId, reactionType);
-    }
+  const handleLikeChange = async (postId, reactionType, isActive, previousUserReaction) => {
+    const payload = { onModel: 'Post', likableId: postId, reactionType, previousUserReaction };
+    await handleReactionChange(payload);
   };
 
 
@@ -122,6 +119,9 @@ export default function ProfilePage() {
                     onLikeChange={handleLikeChange}
                     showOwnerActions={true}
                     currentUserId={user?._id}
+                    onUpdate={updatePost}
+                    onReactionChange={handleReactionChange}
+                    onDelete={deletePost}
                   />
                 ))}
               </div>
