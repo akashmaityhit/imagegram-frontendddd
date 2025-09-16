@@ -95,7 +95,7 @@ const LikeButton = ({
             (like) => like.user?._id !== currentUserId
           );
           console.log("updatedReactions", updatedReactions);
-          setCurrentUserReaction(reactionType);
+          setCurrentUserReaction(null);
           await onReactionChange?.(postId, reactionType, false, userReaction);
         } else {
           // replace previous reaction with new one
