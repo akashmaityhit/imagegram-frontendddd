@@ -17,7 +17,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LikeButton from './LikeButton';
 import CommentSection from './CommentSection';
 import { cn } from '@/utils';
-import { usePosts } from '@/hooks';
 
 const PostCard = ({ 
   post, 
@@ -25,6 +24,8 @@ const PostCard = ({
   showOwnerActions = false,
   currentUserId,
   onDelete,
+  onUpdate,
+  onReactionChange,
 }) => {
   const [showComments, setShowComments] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -36,11 +37,7 @@ const PostCard = ({
   const [description, setDescription] = useState(post.description || '');
 
   // console.log(post)
-
-
   const postId = post._id;
-
-  const { updatePost, handleReactionChange } = usePosts();
 
   const handleLikeChange = async (postId, reactionType, isActive, previousUserReaction) => {
     setIsLiked(isActive);
@@ -52,7 +49,7 @@ const PostCard = ({
       onModel: "Post",
     }
     console.log("handleLikeChange", payload);
-    await handleReactionChange(payload);
+    await onReactionChange?.(payload);
   };
 
 
@@ -66,7 +63,7 @@ const PostCard = ({
     e?.preventDefault?.();
     try {
       setIsSubmitting(true);
-      const result = await updatePost(postId, { caption, description });
+      const result = await onUpdate?.(postId, { caption, description });
       if (result?.success) {
         // Optimistically reflect local changes
         setIsEditOpen(false);

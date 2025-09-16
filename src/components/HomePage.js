@@ -17,6 +17,9 @@ export default function HomePage() {
     hasMore, 
     fetchPosts, 
     loadMorePosts, 
+    updatePost,
+    handleReactionChange,
+    deletePost,
   } = usePosts();
 
   const { user: currentUser } = useAuth();
@@ -121,6 +124,9 @@ export default function HomePage() {
                   key={post._id}
                   post={post}
                   currentUserId={currentUser?._id}
+                  onUpdate={updatePost}
+                  onReactionChange={handleReactionChange}
+                  onDelete={deletePost}
                 />
               ))}
               
