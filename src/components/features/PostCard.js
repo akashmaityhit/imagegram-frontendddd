@@ -103,7 +103,7 @@ const PostCard = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Avatar className="w-10 h-10">
-              <AvatarImage src={post.user?.avatar} alt={post.user?.name} />
+              <AvatarImage src={post.user?.avatar} alt={post.user?.username} />
               <AvatarFallback>
                 <User className="w-5 h-5" />
               </AvatarFallback>
