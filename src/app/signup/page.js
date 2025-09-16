@@ -14,6 +14,7 @@ export default function SignupPage() {
   const { signup, loading } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({
+    fullname: '',
     username: '',
     email: '',
     password: '',
@@ -149,6 +150,30 @@ export default function SignupPage() {
                   {errors.general}
                 </div>
               )}
+
+              <div className="space-y-2">
+                <label htmlFor="fullname" className="block text-sm font-medium text-gray-300">
+                  Full Name
+                </label>
+                <Input
+                  id="fullname"
+                  name="fullname"
+                  type="text"
+                  value={formData.fullname}
+                  onChange={handleChange}
+                  placeholder="Choose a fullname"
+                  className={`bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-purple-500/20 ${
+                    errors.fullname ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''
+                  }`}
+                  disabled={isSubmitting}
+                />
+                {errors.fullname && (
+                  <p className="text-red-400 text-sm flex items-center">
+                    <div className="w-1 h-1 bg-red-400 rounded-full mr-2"></div>
+                    {errors.fullname}
+                  </p>
+                )}
+              </div>
 
               <div className="space-y-2">
                 <label htmlFor="username" className="block text-sm font-medium text-gray-300">

@@ -56,7 +56,7 @@ function PostsLoadingSkeleton() {
   );
 }
 
-function ProfileSection({ user, isOwner }) {
+function ProfileSection({ user, isOwner, totalPosts }) {
   return (
     <Card className="mb-8">
       <CardContent className="p-6">
@@ -69,12 +69,12 @@ function ProfileSection({ user, isOwner }) {
               </AvatarFallback>
             </Avatar>
             <div>
-              <h1 className="text-2xl font-bold">{user?.username || "User"}</h1>
+              <h1 className="text-2xl font-bold">{user?.fullname || "User"}</h1>
               <p className="text-muted-foreground">
                 {user?.fullName || user?.username}
               </p>
               {user?.bio && (
-                <p className="text-sm text-muted-foreground mt-1">{user.bio}</p>
+                <p className="text-sm text-muted-foreground mt-1">{user?.bio}</p>
               )}
             </div>
           </div>
@@ -87,7 +87,7 @@ function ProfileSection({ user, isOwner }) {
 
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="text-center">
-            <div className="text-2xl font-bold">{user?.posts ?? 0}</div>
+            <div className="text-2xl font-bold">{totalPosts}</div>
             <div className="text-sm text-muted-foreground">Posts</div>
           </div>
           <div className="text-center">
@@ -211,7 +211,7 @@ export default function UserPage({ params }) {
           ) : userLoading ? (
             <UserLoadingSkeleton />
           ) : (
-            <ProfileSection user={user} isOwner={user?._id && currentUser?._id ? user._id === currentUser._id : false} />
+            <ProfileSection totalPosts={posts?.length} user={user} isOwner={user?._id && currentUser?._id ? user._id === currentUser._id : false} />
           )}
 
           <div className="mb-6">

@@ -109,7 +109,7 @@ const PostCard = ({
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold text-sm">{post.user?.username || 'Anonymous'}</h3>
+              <h3 className="font-semibold text-sm">{post.user?.fullname || 'Anonymous'}</h3>
               <p className="text-xs text-muted-foreground">
                 {new Date(post.createdAt).toLocaleDateString()}
               </p>
@@ -193,7 +193,7 @@ const PostCard = ({
                 <span>{caption}</span>
               </p>
               {description && (
-                <p className="text-sm text-muted-foreground">{description}</p>
+                <p className="text-sm text-muted-foreground">{"description"}</p>
               )}
             </div>
           )}

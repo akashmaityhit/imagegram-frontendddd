@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+
 import { Settings, Edit, Camera, User, Mail, Calendar } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import PostCard from '@/components/features/PostCard';
@@ -23,8 +23,6 @@ export default function ProfilePage() {
     }
   };
 
-  const handleCommentAdd = (postId, comment) => {
-  };
 
   return (
     <Layout>
@@ -42,7 +40,7 @@ export default function ProfilePage() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h1 className="text-2xl font-bold">{user?.username}</h1>
+                    <h1 className="text-2xl font-bold">{user?.fullname}</h1>
                     <p className="text-muted-foreground">{user?.username}</p>
                     <p className="text-sm text-muted-foreground mt-1">{user?.bio}</p>
                   </div>
