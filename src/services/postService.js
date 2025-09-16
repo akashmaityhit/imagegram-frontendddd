@@ -23,13 +23,13 @@ export const getALLPosts = async (offset = 0, limit = 5) => {
 export const getPostsMadeByUser = async (userId, offset = 0, limit = 5) => {
   try {
     const response = await postsApi.getPostsMadeByUser(userId, offset, limit);
-
     return {
       success: true,
       data: response.data,
       error: null,
     };
   } catch (error) {
+    console.error('Error fetching user posts:', error);
     return {
       success: false,
       data: null,
@@ -37,7 +37,6 @@ export const getPostsMadeByUser = async (userId, offset = 0, limit = 5) => {
     };
   }
 };
-
 
 export const createPost = async (postData) => {
   try {
@@ -47,7 +46,6 @@ export const createPost = async (postData) => {
     }
 
     console.log('Creating post for user:', user);
-    
     
     const response = await postsApi.createPost({...postData, user: user._id });
     return {
@@ -100,40 +98,3 @@ export const deletePost = async (postId) => {
     };
   }
 };
-
-export const likePost = async (postId, reactionType) => {
-  try {
-    const response = await postsApi.likePost(postId, reactionType);
-    return {
-      success: true,
-      data: response.data,
-      error: null,
-    };
-  } catch (error) {
-    console.error('Error liking post:', error);
-    return {
-      success: false,
-      data: null,
-      error: error.message,
-    };
-  }
-};
-
-export const unlikePost = async (postId, reactionType) => {
-  try {
-    const response = await postsApi.unlikePost(postId, reactionType);
-    return {
-      success: true,
-      data: response.data,
-      error: null,
-    };
-  } catch (error) {
-    console.error('Error unliking post:', error);
-    return {
-      success: false,
-      data: null,
-      error: error.message,
-    };
-  }
-};
-

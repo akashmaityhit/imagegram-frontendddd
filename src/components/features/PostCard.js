@@ -17,11 +17,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import LikeButton from './LikeButton';
 import CommentSection from './CommentSection';
 import { cn } from '@/utils';
-import { useComments, usePosts } from '@/hooks';
+import { usePosts } from '@/hooks';
 
 const PostCard = ({ 
   post, 
-  onLikeChange, 
   className,
   showOwnerActions = false,
   currentUserId,
@@ -36,14 +35,24 @@ const PostCard = ({
   const [caption, setCaption] = useState(post.caption || '');
   const [description, setDescription] = useState(post.description || '');
 
+  // console.log(post)
+
 
   const postId = post._id;
 
-  const { updatePost } = usePosts();
+  const { updatePost, handleReactionChange } = usePosts();
 
-  const handleLikeChange = (postId, reactionType, isActive) => {
+  const handleLikeChange = async (postId, reactionType, isActive, previousUserReaction) => {
     setIsLiked(isActive);
-    onLikeChange?.(postId, reactionType, isActive);
+    const payload = {
+      reactionType,
+      isActive,
+      previousUserReaction,
+      likableId: postId,
+      onModel: "Post",
+    }
+    console.log("handleLikeChange", payload);
+    await handleReactionChange(payload);
   };
 
 
@@ -139,6 +148,7 @@ const PostCard = ({
             src={post.image}
             alt={post.caption}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover"
             priority
           />
@@ -150,9 +160,13 @@ const PostCard = ({
             <div className="flex items-center space-x-4">
               <LikeButton
                 postId={post._id}
-                initialReactions={post.reactions || {}}
+                initialReactions={post?.likes || []}
                 onReactionChange={handleLikeChange}
+                currentUserId={currentUserId}
+                userReaction={post?.currentUserLike}
               />
+              
+            
               <Button
                 variant="ghost"
                 size="sm"

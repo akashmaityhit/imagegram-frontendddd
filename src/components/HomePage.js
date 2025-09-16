@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
 import PostCard from '@/components/features/PostCard';
-import { usePosts } from '@/hooks';
+import { useAuth, usePosts } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,9 +17,9 @@ export default function HomePage() {
     hasMore, 
     fetchPosts, 
     loadMorePosts, 
-    likePost, 
-    unlikePost 
   } = usePosts();
+
+  const { user: currentUser } = useAuth();
 
   const PostsLoadingSkeleton = () => (
     <div className="space-y-8">
@@ -35,14 +35,6 @@ export default function HomePage() {
     </div>
   );
 
-
-  const handleLikeChange = async (postId, reactionType, isActive) => {
-    if (isActive) {
-      await likePost(postId, reactionType);
-    } else {
-      await unlikePost(postId, reactionType);
-    }
-  };
 
 
   const handleRefresh = () => {
@@ -128,7 +120,7 @@ export default function HomePage() {
                 <PostCard
                   key={post._id}
                   post={post}
-                  onLikeChange={handleLikeChange}
+                  currentUserId={currentUser?._id}
                 />
               ))}
               

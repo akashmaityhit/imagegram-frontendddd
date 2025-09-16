@@ -122,7 +122,6 @@ export default function ProfilePage() {
                     key={post._id}
                     post={post}
                     onLikeChange={handleLikeChange}
-                    onCommentAdd={handleCommentAdd}
                     showOwnerActions={true}
                     currentUserId={user?._id}
                   />

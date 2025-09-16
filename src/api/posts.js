@@ -35,8 +35,8 @@ export const postsApi = {
     axiosInstance.get(`/posts/${postId}`),
 
   // Like/unlike a post
-  likePost: (postId, reactionType) => 
-    axiosInstance.post(`/posts/${postId}/like`, { reactionType }),
+  likePost: (onModel, likableId, reactionType) => 
+    axiosInstance.post(`/posts/${likableId}/like`, { onModel, likableId, reactionType }),
 
   // Unlike a post
   unlikePost: (postId, reactionType) => 

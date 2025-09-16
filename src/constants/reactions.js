@@ -1,19 +1,12 @@
 // Reaction types and their configurations
 export const REACTION_TYPES = {
-  LIKE: 'like',
   LOVE: 'love',
-  SUPPORT: 'support',
-  CONGRATS: 'congrats',
-  SMILE: 'smile',
+  CELEBRATE: 'celebrate',
+  FUNNY: 'funny',
+  ANGRY: 'angry',
 };
 
 export const REACTION_CONFIG = [
-  { 
-    type: REACTION_TYPES.LIKE, 
-    icon: 'ThumbsUp', 
-    color: 'text-blue-500', 
-    label: 'Like' 
-  },
   { 
     type: REACTION_TYPES.LOVE, 
     icon: 'Heart', 
@@ -21,22 +14,22 @@ export const REACTION_CONFIG = [
     label: 'Love' 
   },
   { 
-    type: REACTION_TYPES.SUPPORT, 
-    icon: 'Star', 
-    color: 'text-yellow-500', 
-    label: 'Support' 
-  },
-  { 
-    type: REACTION_TYPES.CONGRATS, 
+    type: REACTION_TYPES.CELEBRATE, 
     icon: 'PartyPopper', 
     color: 'text-green-500', 
-    label: 'Congrats' 
+    label: 'Celebrate' 
   },
   { 
-    type: REACTION_TYPES.SMILE, 
+    type: REACTION_TYPES.FUNNY, 
     icon: 'Smile', 
-    color: 'text-purple-500', 
-    label: 'Smile' 
+    color: 'text-yellow-500', 
+    label: 'Funny' 
+  },
+  { 
+    type: REACTION_TYPES.ANGRY, 
+    icon: 'Angry', 
+    color: 'text-orange-500', 
+    label: 'Angry' 
   },
 ];
 

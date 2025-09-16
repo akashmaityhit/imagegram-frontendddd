@@ -4,10 +4,13 @@ import {
   createPost,
   updatePost,
   deletePost,
-  likePost,
-  unlikePost,
   getPostsMadeByUser,
 } from "@/services/postService";
+import {
+  createPostLike,
+  deletePostLike,
+  updatePostLike,
+} from "@/services/likeService";
 
 export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
   const [posts, setPosts] = useState([]);
@@ -21,7 +24,7 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
         setLoading(true);
 
         let result = userId
-          ? await getPostsMadeByUser(userId, offset, initialLimit)
+          ? await getPostsMadeByUser(userId, offset, limit)
           : await getALLPosts(offset, limit);
 
         if (result.success) {
@@ -46,7 +49,7 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
 
     try {
       setLoading(true);
-      const offset = posts.length;
+      const offset = posts?.length || 0;
       const result = userId
         ? await getPostsMadeByUser(userId, offset, initialLimit)
         : await getALLPosts(offset, initialLimit);
@@ -56,6 +59,9 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
         const totalDocuments = result.data.totalDocuments ?? 0;
         const accumulatedCount = offset + (result.data.posts?.length ?? 0);
         setHasMore(accumulatedCount < totalDocuments);
+      } else {
+        setError(result.error?.message || "Failed to load more posts");
+        return;
       }
     } catch (err) {
       setError("Failed to fetch more posts");
@@ -101,11 +107,6 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
       const result = await deletePost(postId);
       if (result.success) {
         setPosts((prev) => prev.filter((post) => post._id !== postId));
-
-        const totalDocuments = result.data.totalDocuments || 0;
-        const accumulatedCount = offset + (result.data.posts?.length || 0);
-        setHasMore(accumulatedCount < totalDocuments);
-
         return { success: true };
       } else {
         return { success: false, error: result.error };
@@ -115,58 +116,87 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
     }
   };
 
-  const likePostHandler = async (postId, reactionType) => {
+  const handleReactionChange = async ({
+    onModel,
+    likableId,
+    reactionType,
+    previousUserReaction,
+  }) => {
     try {
-      const result = await likePost(postId, reactionType);
-      if (result.success) {
-        setPosts((prev) =>
-          prev.map((post) =>
-            post._id === postId
-              ? {
-                  ...post,
-                  reactions: {
-                    ...post.reactions,
-                    [reactionType]: (post.reactions[reactionType] || 0) + 1,
-                  },
-                }
-              : post
-          )
-        );
-        return { success: true };
-      } else {
-        return { success: false, error: result.error };
-      }
-    } catch (err) {
-      return { success: false, error: "Failed to like post" };
-    }
-  };
+      let apiResponse;
 
-  const unlikePostHandler = async (postId, reactionType) => {
-    try {
-      const result = await unlikePost(postId, reactionType);
-      if (result.success) {
-        setPosts((prev) =>
-          prev.map((post) =>
-            post._id === postId
-              ? {
-                  ...post,
-                  reactions: {
-                    ...post.reactions,
-                    [reactionType]: Math.max(
-                      (post.reactions[reactionType] || 0) - 1,
-                      0
-                    ),
-                  },
-                }
-              : post
-          )
+      if (!previousUserReaction) {
+        apiResponse = await createPostLike(onModel, likableId, reactionType);
+      } else if (previousUserReaction.likeType !== reactionType) {
+        apiResponse = await updatePostLike(
+          previousUserReaction._id,
+          onModel,
+          likableId,
+          reactionType
         );
-        return { success: true };
       } else {
-        return { success: false, error: result.error };
+        apiResponse = await deletePostLike(
+          previousUserReaction._id,
+          onModel,
+          likableId
+        );
       }
+
+      if (!apiResponse?.success) {
+        return {
+          success: false,
+          error: apiResponse?.error || "Reaction request failed",
+        };
+      }
+
+      const returnedLike = apiResponse?.data?.data || apiResponse?.data || null;
+
+      setPosts((prev) =>
+        prev.map((post) => {
+          if (post._id !== likableId) return post;
+
+          // likes is an array of like objects
+          const previousLike = previousUserReaction;
+          let updatedLikes = Array.isArray(post.likes) ? [...post.likes] : [];
+          let updatedCurrentUserLike = post?.currentUserLike || null;
+
+          if (!previousLike) {
+            // created
+            if (returnedLike) {
+              updatedLikes.push(returnedLike);
+              updatedCurrentUserLike = returnedLike;
+            }
+          } else if (previousLike.likeType !== reactionType) {
+            // updated
+            updatedLikes = updatedLikes.map((like) =>
+              like._id === previousLike._id
+                ? { ...like, likeType: reactionType }
+                : like
+            );
+            updatedCurrentUserLike = {
+              ...previousLike,
+              likeType: reactionType,
+            };
+          } else {
+            // deleted
+            updatedLikes = updatedLikes.filter(
+              (like) => like._id !== previousLike._id
+            );
+            updatedCurrentUserLike = null;
+          }
+
+          return {
+            ...post,
+            likes: updatedLikes,
+            currentUserLike: updatedCurrentUserLike,
+          };
+        })
+      );
+
+      return { success: true };
     } catch (err) {
-      return { success: false, error: "Failed to unlike post" };
+      console.error("Failed to update reaction", err);
+      return { success: false, error: "Failed to update reaction" };
     }
   };
 
@@ -184,7 +214,6 @@ export const usePosts = (userId, initialOffset = 0, initialLimit = 10) => {
     createPost: createPostHandler,
     updatePost: updatePostHandler,
     deletePost: deletePostHandler,
-    likePost: likePostHandler,
-    unlikePost: unlikePostHandler,
+    handleReactionChange,
   };
 };
