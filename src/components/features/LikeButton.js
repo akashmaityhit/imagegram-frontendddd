@@ -166,7 +166,8 @@ const LikeButton = ({
         onClick={onClick}
         className={cn(
           "rounded-full flex items-center justify-center transition-all duration-200 active:scale-95",
-          "bg-secondary border border-border",
+          "bg-secondary/70 hover:bg-secondary border border-border/60 hover:border-border",
+          "shadow-sm hover:shadow-md",
           color,
           isUserReaction && "ring-2 ring-blue-500 scale-110 bg-accent",
           size
@@ -195,10 +196,10 @@ const LikeButton = ({
             variant="ghost"
             size="sm"
             className={cn(
-              "flex items-center space-x-1 hover:bg-accent transition-colors duration-200 active:scale-95",
+              "flex items-center space-x-1 hover:bg-accent/80 transition-colors duration-200 active:scale-95",
               currentUserReaction && "text-blue-500",
               // Accessible touch target on small screens
-              "min-h-11 min-w-11"
+              "min-h-11 min-w-11 rounded-full"
             )}
             disabled={isLoading}
             onClick={handleButtonClick}
@@ -219,7 +220,7 @@ const LikeButton = ({
           {/* Desktop popup (md and up) */}
          {showReactions && (
             <div
-              className="hidden md:flex absolute bottom-full left-0 mb-1 bg-card border border-border rounded-2xl shadow-2xl p-2 items-center space-x-1 z-50 animate-in fade-in-0 zoom-in-95 duration-200"
+              className="hidden md:flex absolute bottom-full left-0 mb-1 bg-popover/95 backdrop-blur-sm border border-border/60 rounded-2xl shadow-xl p-2 items-center space-x-1 z-50 animate-in fade-in-0 zoom-in-95 duration-200"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
@@ -241,7 +242,7 @@ const LikeButton = ({
 
           {/* Mobile popup (below md) */}
           {showMobileReactions && (
-            <div className="md:hidden absolute bottom-full left-0 mb-2 bg-card border border-border rounded-2xl shadow-2xl p-3 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
+            <div className="md:hidden absolute bottom-full left-0 mb-2 bg-popover/95 backdrop-blur-sm border border-border/60 rounded-2xl shadow-xl p-3 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
               <div className="flex flex-col space-y-2">
                 <div className="flex items-center justify-center space-x-2">
                   {REACTION_CONFIG.map(({ type, icon, color, label }) => (

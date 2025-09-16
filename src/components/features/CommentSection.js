@@ -1,20 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Send, User, Reply, RefreshCw } from "lucide-react";
+import { Send, User, Reply, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import LikeButton from "./LikeButton";
 import { cn } from "@/utils";
 import { useComments } from "@/hooks";
 
-const CommentSection = ({ postId, initialComments = [], className }) => {
+const CommentSection = ({ postId, initialComments = [], className, currentUserId }) => {
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState("");
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const { comments, replyToCommentHandler, createCommentHandler, fetchPaginatedComments, hasMore, loadMoreComments, loading } = useComments(postId, initialComments);
+  const { comments, replyToCommentHandler, createCommentHandler, fetchPaginatedComments, hasMore, loadMoreComments, loading, deleteComment } = useComments(postId, initialComments);
 
   useEffect(() => {
     const fetchInitial = async () => {
@@ -63,9 +67,15 @@ const CommentSection = ({ postId, initialComments = [], className }) => {
   };
 
   const renderComment = (comment, isReply = false) => (
-    <div key={comment._id} className={cn("space-y-2", isReply && "ml-8")}>
-      <div className="flex items-start space-x-3">
-        <Avatar className="w-8 h-8">
+    <div
+      key={comment._id}
+      className={cn(
+        "space-y-2 pb-3 border-b border-border/60 last:border-b-0",
+        isReply && "ml-8 border-none pb-2"
+      )}
+    >
+      <div className="flex items-start gap-3">
+        <Avatar className="w-8 h-8 ring-2 ring-border/60">
           <AvatarImage
             src={comment.userId?.avatar}
             alt={comment.userId?.name}
@@ -74,31 +84,44 @@ const CommentSection = ({ postId, initialComments = [], className }) => {
             <User className="w-4 h-4" />
           </AvatarFallback>
         </Avatar>
-        <div className="flex-1 space-y-1">
-          <div className="flex items-center space-x-2">
-            <span className="font-semibold text-sm">
+        <div className="flex-1 space-y-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-sm hover:text-foreground transition-colors">
               {comment.userId?.username || "Anonymous"}
             </span>
             <span className="text-xs text-muted-foreground">
               {new Date(comment.updatedAt).toLocaleDateString()}
             </span>
+            {currentUserId && (comment.userId?._id === currentUserId) && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="ml-auto hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-full"
+                title="Delete comment"
+                onClick={() => { setCommentToDelete(comment); setIsDeleteOpen(true); }}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
           </div>
-          <p className="text-sm">{comment.content}</p>
-          <div className="flex items-center space-x-4">
+          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+            {comment.content}
+          </p>
+          <div className="flex items-center gap-3">
             <LikeButton
               postId={comment._id}
               initialReactions={comment?.reactions || {}}
               onReactionChange={handleLikeChange}
-              className="text-xs"
+              className="text-xs transform scale-90 origin-left md:scale-100 opacity-90 hover:opacity-100"
             />
             {!isReply && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setReplyingTo(comment._id)}
-                className="text-xs h-auto p-0"
+                className="h-7 px-2 text-[11px] gap-1 hover:bg-accent/80 rounded-full"
               >
-                <Reply className="w-3 h-3 mr-1" />
+                <Reply className="w-3 h-3" />
                 Reply
               </Button>
             )}
@@ -133,6 +156,7 @@ const CommentSection = ({ postId, initialComments = [], className }) => {
                 setReplyingTo(null);
                 setReplyText("");
               }}
+              className="hover:bg-accent/80 rounded-full"
             >
               Cancel
             </Button>
@@ -152,7 +176,7 @@ const CommentSection = ({ postId, initialComments = [], className }) => {
   return (
     <div className={cn("space-y-4", className)}>
       {/* Comments list */}
-      <div className="space-y-4 max-h-96 overflow-y-auto">
+      <div className="space-y-4 max-h-96 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-border/60 scrollbar-track-transparent">
         {comments.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
             No comments yet. Be the first to comment!
@@ -169,7 +193,7 @@ const CommentSection = ({ postId, initialComments = [], className }) => {
               onClick={handleLoadMoreComments}
               disabled={loading}
               variant="outline"
-              className="w-full"
+              className="w-full hover:bg-accent/80"
             >
               {loading ? (
                 <>
@@ -192,10 +216,41 @@ const CommentSection = ({ postId, initialComments = [], className }) => {
           onChange={(e) => setNewComment(e.target.value)}
           className="flex-1"
         />
-        <Button type="submit" size="sm" disabled={!newComment.trim()}>
+        <Button type="submit" size="sm" disabled={!newComment.trim()} className="hover:bg-accent/80">
           <Send className="w-4 h-4" />
         </Button>
       </form>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete comment?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">This action cannot be undone.</p>
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={() => { setIsDeleteOpen(false); setCommentToDelete(null); }} disabled={isDeleting}>Cancel</Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={isDeleting}
+              onClick={async () => {
+                if (!commentToDelete) return;
+                try {
+                  setIsDeleting(true);
+                  await deleteComment(commentToDelete._id);
+                } finally {
+                  setIsDeleting(false);
+                  setIsDeleteOpen(false);
+                  setCommentToDelete(null);
+                }
+              }}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

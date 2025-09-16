@@ -98,18 +98,25 @@ const PostCard = ({
   const canShowOwnerActions = showOwnerActions && isOwner;
 
   return (
-    <Card className={cn("w-full max-w-2xl mx-auto", className)}>
+    <Card className={cn(
+      "w-full max-w-2xl mx-auto",
+      "rounded-xl border border-border/60 bg-card/80 backdrop-blur-sm",
+      "shadow-sm hover:shadow-md transition-all duration-300",
+      className
+    )}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Avatar className="w-10 h-10">
+            <Avatar className="w-10 h-10 ring-2 ring-border/60">
               <AvatarImage src={post.user?.avatar} alt={post.user?.username} />
               <AvatarFallback>
                 <User className="w-5 h-5" />
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold text-sm">{post.user?.fullname || 'Anonymous'}</h3>
+              <h3 className="font-semibold text-sm hover:text-foreground transition-colors">
+                {post.user?.fullname || 'Anonymous'}
+              </h3>
               <p className="text-xs text-muted-foreground">
                 {new Date(post.createdAt).toLocaleDateString()}
               </p>
@@ -117,19 +124,24 @@ const PostCard = ({
           </div>
           {canShowOwnerActions && (
             <div className="relative">
-              <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen((v) => !v)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMenuOpen((v) => !v)}
+                className="hover:bg-accent rounded-full"
+              >
                 <MoreHorizontal className="w-4 h-4" />
               </Button>
               {isMenuOpen && (
-                <div className="absolute right-0 mt-2 w-40 rounded-md border bg-background shadow-md z-10">
+                <div className="absolute right-0 mt-2 w-44 rounded-lg border bg-popover text-popover-foreground shadow-lg z-10 overflow-hidden">
                   <button
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-accent/80 transition-colors"
                     onClick={() => { setIsEditOpen(true); }}
                   >
                     Edit
                   </button>
                   <button
-                    className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-accent"
+                    className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-accent/80 transition-colors"
                     onClick={() => { setIsDeleteOpen(true); }}
                   >
                     Delete
@@ -143,20 +155,22 @@ const PostCard = ({
 
       <CardContent className="p-0">
         {/* Image */}
-        <div className="relative w-full aspect-square">
+        <div className="relative w-full aspect-square overflow-hidden rounded-t-xl">
           <Image
             src={post.image}
             alt={post.caption}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
+            className="object-cover transition-transform duration-500 will-change-transform hover:scale-[1.02]"
             priority
           />
+          {/* subtle gradient overlay for depth */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
         </div>
 
         {/* Actions */}
         <div className="p-4 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between border-b border-border/60 pb-3">
             <div className="flex items-center space-x-4">
               <LikeButton
                 postId={post._id}
@@ -171,14 +185,14 @@ const PostCard = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleToggleComments}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 hover:bg-accent rounded-full"
               >
                 <MessageCircle className="w-5 h-5" />
                 <span className="text-sm">
                   {post.comments?.length || 0}
                 </span>
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="hover:bg-accent rounded-full">
                 <Share className="w-5 h-5" />
               </Button>
             </div>
@@ -186,9 +200,9 @@ const PostCard = ({
 
           {/* Caption */}
           {caption && (
-            <div className="space-y-1">
-              <p className="text-sm">
-                <span className="font-semibold">{post.user?.username || 'Anonymous'}</span>
+            <div className="space-y-2">
+              <p className="text-sm leading-relaxed">
+                <span className="font-semibold hover:text-foreground transition-colors">{post.user?.username || 'Anonymous'}</span>
                 {' '}
                 <span>{caption}</span>
               </p>
@@ -200,10 +214,14 @@ const PostCard = ({
 
           {/* Comments Section */}
           {showComments && (
-            <CommentSection
-              postId={postId}
-              initialComments={[]}
-            />
+            <div className="mt-2 rounded-xl border border-border/60 bg-card/60">
+              <CommentSection
+                postId={postId}
+                initialComments={[]}
+                currentUserId={currentUserId}
+                className="p-4"
+              />
+            </div>
           )}
         </div>
       </CardContent>
