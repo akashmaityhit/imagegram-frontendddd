@@ -13,7 +13,7 @@ export const createComment = async (commentData) => {
       error: null,
     };
   } catch (error) {
-    console.error('Error creating comment:', error);
+    console.log('Error creating comment:', error);
     return {
       success: false,
       data: null,
@@ -33,7 +33,7 @@ export const replyToComment = async (commentData) => {
       error: null,
     };
   } catch (error) {
-    console.error('Error replying to comment:', error);
+    console.log('Error replying to comment:', error);
     return {
       success: false,
       data: null,
@@ -52,7 +52,7 @@ export const getPostComments = async (onModel, commentableId, offset, limit) => 
       error: null,
     };
   } catch (error) {
-    console.error('Error fetching comments:', error);
+    console.log('Error fetching comments:', error);
     return {
       success: false,
       data: [],
@@ -70,7 +70,7 @@ export const updateComment = async (commentId, commentData) => {
       error: null,
     };
   } catch (error) {
-    console.error('Error updating comment:', error);
+    console.log('Error updating comment:', error);
     return {
       success: false,
       data: null,
@@ -88,7 +88,7 @@ export const deleteComment = async (commentId) => {
       error: null,
     };
   } catch (error) {
-    console.error('Error deleting comment:', error);
+    console.log('Error deleting comment:', error);
     return {
       success: false,
       data: null,
@@ -106,7 +106,7 @@ export const likeComment = async (commentId, reactionType) => {
       error: null,
     };
   } catch (error) {
-    console.error('Error liking comment:', error);
+    console.log('Error liking comment:', error);
     return {
       success: false,
       data: null,
@@ -124,7 +124,7 @@ export const unlikeComment = async (commentId, reactionType) => {
       error: null,
     };
   } catch (error) {
-    console.error('Error unliking comment:', error);
+    console.log('Error unliking comment:', error);
     return {
       success: false,
       data: null,

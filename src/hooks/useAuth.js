@@ -61,7 +61,7 @@ export const useAuth = () => {
     const validateToken = () => {
       const authenticated = isAuthenticated();
       if (!authenticated) {
-        console.log('Token validation failed, signing out...');
+        console.error('Token validation failed, signing out...');
         signOut();
       }
     };

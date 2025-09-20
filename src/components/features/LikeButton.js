@@ -46,9 +46,6 @@ const LikeButton = ({
     setReactions(initialReactions);
   }, [initialReactions]);
 
-  useEffect(() => {
-    setCurrentUserReaction(userReaction?.likeType || null);
-  }, [userReaction]);
 
   useEffect(() => {
     const timeoutAtMount = timeoutRef.current;
@@ -95,22 +92,23 @@ const LikeButton = ({
             (like) => like.user?._id !== currentUserId
           );
           console.log("updatedReactions", updatedReactions);
-          setCurrentUserReaction(null);
           await onReactionChange?.(postId, reactionType, false, userReaction);
+          setCurrentUserReaction(null);
         } else {
           // replace previous reaction with new one
           updatedReactions = updatedReactions.filter(
             (like) => like.user?._id !== currentUserId && like.userId !== currentUserId
           );
           updatedReactions.push({ userId: currentUserId, user: { _id: currentUserId }, likeType: reactionType });
-          setCurrentUserReaction(reactionType);
           await onReactionChange?.(postId, reactionType, true, userReaction);
+          setCurrentUserReaction(reactionType);
         }
 
         setReactions(updatedReactions);
         setShowReactions(false);
       } catch (error) {
         console.error("Error handling reaction:", error);
+        // Revert to previous state on error
         setReactions(initialReactions || []);
         setCurrentUserReaction(userReaction?.likeType || null);
       } finally {

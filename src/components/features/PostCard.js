@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { MessageCircle, Share, MoreHorizontal, User } from 'lucide-react';
+import { MessageCircle, Share, MoreHorizontal, User, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,6 +36,9 @@ const PostCard = ({
   const [caption, setCaption] = useState(post.caption || '');
   const [description, setDescription] = useState(post.description || '');
 
+  const [copied, setCopied] = useState(false);
+  const copyResetTimeoutRef = useRef(null);
+
   // console.log(post)
   const postId = post._id;
 
@@ -48,7 +51,7 @@ const PostCard = ({
       likableId: postId,
       onModel: "Post",
     }
-    console.log("handleLikeChange", payload);
+    // console.log("handleLikeChange", payload);
     await onReactionChange?.(payload);
   };
 
@@ -93,6 +96,37 @@ const PostCard = ({
 
   const isOwner = post?.user?._id && currentUserId ? post.user._id === currentUserId : false;
   const canShowOwnerActions = showOwnerActions && isOwner;
+
+
+  const handleShare = async () => {
+    try {
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const url = `${origin}/posts/${postId}`;
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        // Fallback for older browsers
+        const tempInput = document.createElement('input');
+        tempInput.value = url;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+      }
+      setCopied(true);
+      if (copyResetTimeoutRef.current) clearTimeout(copyResetTimeoutRef.current);
+      copyResetTimeoutRef.current = setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      // no-op minimal error handling per existing style
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (copyResetTimeoutRef.current) clearTimeout(copyResetTimeoutRef.current);
+    };
+  }, []);
+
 
   return (
     <Card className={cn(
@@ -189,8 +223,18 @@ const PostCard = ({
                   {post.comments?.length || 0}
                 </span>
               </Button>
-              <Button variant="ghost" size="sm" className="hover:bg-accent rounded-full">
-                <Share className="w-5 h-5" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleShare}
+                title={copied ? 'Link copied!' : 'Copy post link'}
+                className="hover:bg-accent rounded-full"
+              >
+                {copied ? (
+                  <Check className="w-5 h-5 text-green-500" />
+                ) : (
+                  <Share className="w-5 h-5" />
+                )}
               </Button>
             </div>
           </div>
