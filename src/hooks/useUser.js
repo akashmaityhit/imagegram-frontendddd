@@ -64,6 +64,7 @@ export const useUser = (userId) => {
     loading,
     error,
     fetchUserDetails,
+    setUser, // expose local setter for optimistic updates
     userList,
     searchUsers: searchUsersByQuery,
   };
