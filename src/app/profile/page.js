@@ -51,15 +51,15 @@ export default function ProfilePage() {
               {/* Stats */}
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold">{user?.posts}</div>
+                  <div className="text-2xl font-bold">{user?.posts ?? (Array.isArray(user?.postIds) ? user.postIds.length : 0)}</div>
                   <div className="text-sm text-muted-foreground">Posts</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold">{user?.followers}</div>
+                  <div className="text-2xl font-bold">{Array.isArray(user?.followers) ? user.followers.length : (user?.followers ?? 0)}</div>
                   <div className="text-sm text-muted-foreground">Followers</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold">{user?.following}</div>
+                  <div className="text-2xl font-bold">{Array.isArray(user?.following) ? user.following.length : (user?.following ?? 0)}</div>
                   <div className="text-sm text-muted-foreground">Following</div>
                 </div>
               </div>

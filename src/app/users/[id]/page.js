@@ -9,6 +9,7 @@ import { Calendar, Mail, User, Camera, RefreshCw } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 import { useAuth, usePosts } from "@/hooks";
 import { Button } from "@/components/ui/button";
+import FollowButton from "@/components/features/FollowButton";
 
 function UserLoadingSkeleton() {
   return (
@@ -56,7 +57,7 @@ function PostsLoadingSkeleton() {
   );
 }
 
-function ProfileSection({ user, isOwner, totalPosts }) {
+function ProfileSection({ user, isOwner, totalPosts, currentUser, onUpdateUser, onUpdateAuth }) {
   return (
     <Card className="mb-8">
       <CardContent className="p-6">
@@ -78,10 +79,18 @@ function ProfileSection({ user, isOwner, totalPosts }) {
               )}
             </div>
           </div>
-          {isOwner && (
+          {isOwner ? (
             <Button variant="outline" size="sm">
               Edit Profile
             </Button>
+          ) : (
+            <FollowButton
+              targetUser={user}
+              currentUser={currentUser}
+              onTargetUserUpdate={onUpdateUser}
+              onAuthUserUpdate={onUpdateAuth}
+              size="sm"
+            />
           )}
         </div>
 
@@ -91,11 +100,11 @@ function ProfileSection({ user, isOwner, totalPosts }) {
             <div className="text-sm text-muted-foreground">Posts</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">{user?.followers ?? 0}</div>
+            <div className="text-2xl font-bold">{Array.isArray(user?.followers) ? user.followers.length : (user?.followers ?? 0)}</div>
             <div className="text-sm text-muted-foreground">Followers</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">{user?.following ?? 0}</div>
+            <div className="text-2xl font-bold">{Array.isArray(user?.following) ? user.following.length : (user?.following ?? 0)}</div>
             <div className="text-sm text-muted-foreground">Following</div>
           </div>
         </div>
@@ -187,7 +196,7 @@ export default function UserPage({ params }) {
   const { id } = use(params);
   const userId = id;
 
-  const { loading: userLoading, error: userError, user } = useUser(userId);
+  const { loading: userLoading, error: userError, user, setUser } = useUser(userId);
   const {
     posts,
     hasMore,
@@ -197,7 +206,7 @@ export default function UserPage({ params }) {
     deletePost,
   } = usePosts(userId);
 
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, updateUser: updateAuthUser } = useAuth();
   return (
     <Layout>
       <div className="min-h-screen bg-background">
@@ -211,7 +220,14 @@ export default function UserPage({ params }) {
           ) : userLoading ? (
             <UserLoadingSkeleton />
           ) : (
-            <ProfileSection totalPosts={posts?.length} user={user} isOwner={user?._id && currentUser?._id ? user._id === currentUser._id : false} />
+            <ProfileSection
+              totalPosts={posts?.length}
+              user={user}
+              isOwner={user?._id && currentUser?._id ? user._id === currentUser._id : false}
+              currentUser={currentUser}
+              onUpdateUser={setUser}
+              onUpdateAuth={updateAuthUser}
+            />
           )}
 
           <div className="mb-6">
