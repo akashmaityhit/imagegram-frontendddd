@@ -10,7 +10,6 @@ import { useUser } from "@/hooks/useUser";
 import { useAuth, usePosts } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/features/FollowButton";
-import { deletePost, updatePost } from "@/services/postService";
 
 
 function UserLoadingSkeleton() {
@@ -155,6 +154,7 @@ function PostsSection({
   hasMore,
   loadMorePosts,
   onDelete,
+  onUpdate,
   postLoading,
   handleReactionChange
 }) {
@@ -179,9 +179,9 @@ function PostsSection({
           key={post._id}
           post={post}
           currentUserId={currentUser?._id}
-          onUpdate={updatePost}
+          onUpdate={onUpdate}
           onReactionChange={handleReactionChange}
-          onDelete={deletePost}
+          onDelete={onDelete}
           showOwnerActions={true}
         />
       ))}
@@ -226,7 +226,9 @@ export default function UserPage({ params }) {
     loading: postLoading,
     error: postError,
     deletePost,
-    handleReactionChange
+    handleReactionChange,
+    deletePost: deletePostHandler,
+    updatePost: updatePostHandler
   } = usePosts(userId);
 
   const { user: currentUser } = useAuth();
@@ -272,7 +274,8 @@ export default function UserPage({ params }) {
                 <PostsSection
                   posts={posts}
                   currentUser={currentUser}
-                  onDelete={deletePost}
+                  onDelete={deletePostHandler}
+                  onUpdate={updatePostHandler}
                   hasMore={hasMore}
                   loadMorePosts={loadMorePosts}
                   postLoading={postLoading}
