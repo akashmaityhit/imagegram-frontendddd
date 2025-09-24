@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState, useCallback } from "react";
 import Layout from "@/components/layout/Layout";
 import PostCard from "@/components/features/PostCard";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,7 +10,6 @@ import { useUser } from "@/hooks/useUser";
 import { useAuth, usePosts } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import FollowButton from "@/components/features/FollowButton";
-
 
 function UserLoadingSkeleton() {
   return (
@@ -63,6 +62,8 @@ function ProfileSection({
   isOwner,
   totalPosts,
   currentUser,
+  onTargetUserUpdate,
+  onAuthUserUpdate,
 }) {
   return (
     <Card className="mb-8">
@@ -95,6 +96,8 @@ function ProfileSection({
             <FollowButton
               targetUser={user}
               currentUser={currentUser}
+              onTargetUserUpdate={onTargetUserUpdate}
+              onAuthUserUpdate={onAuthUserUpdate}
               size="sm"
             />
           )}
@@ -156,7 +159,7 @@ function PostsSection({
   onDelete,
   onUpdate,
   postLoading,
-  handleReactionChange
+  handleReactionChange,
 }) {
   if (posts?.length === 0) {
     return (
@@ -218,6 +221,7 @@ export default function UserPage({ params }) {
     loading: userLoading,
     error: userError,
     user,
+    setUser: setTargetUser,
   } = useUser(userId);
   const {
     posts,
@@ -225,13 +229,27 @@ export default function UserPage({ params }) {
     loadMorePosts,
     loading: postLoading,
     error: postError,
-    deletePost,
-    handleReactionChange,
     deletePost: deletePostHandler,
-    updatePost: updatePostHandler
+    updatePost: updatePostHandler,
+    handleReactionChange,
   } = usePosts(userId);
 
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, setUser: setCurrentUser } = useAuth();
+
+  const handleTargetUserUpdate = useCallback((updater) => {
+    setTargetUser((prev) => {
+      const nextUser = typeof updater === "function" ? updater(prev) : updater;
+      return nextUser;
+    });
+  }, [setTargetUser]);
+
+  const handleAuthUserUpdate = useCallback((updater) => {
+    setCurrentUser((prev) => {
+      const nextUser = typeof updater === "function" ? updater(prev) : updater;
+      return nextUser;
+    });
+  }, [setCurrentUser]);
+
   return (
     <Layout>
       <div className="min-h-screen bg-background">
@@ -248,12 +266,10 @@ export default function UserPage({ params }) {
             <ProfileSection
               totalPosts={posts?.length}
               user={user}
-              isOwner={
-                user?._id && currentUser?._id
-                  ? user._id === currentUser._id
-                  : false
-              }
+              isOwner={user?._id === currentUser?._id}
               currentUser={currentUser}
+              onTargetUserUpdate={handleTargetUserUpdate}
+              onAuthUserUpdate={handleAuthUserUpdate}
             />
           )}
 
