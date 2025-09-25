@@ -17,7 +17,7 @@ axiosInstance.interceptors.request.use(
     const token = getAuthToken();
     // console.log('Request token:', token);
     if (token && isTokenValid(token)) {
-      config.headers.Authorization = token;
+      config.headers.Authorization = `${token}`;
     }
     return config;
   },
