@@ -11,7 +11,7 @@ import { Camera, Eye, EyeOff, Loader2, ArrowLeft, CheckCircle } from 'lucide-rea
 import { useAuth } from '@/hooks';
 
 export default function SignupPage() {
-  const { signup, loading } = useAuth();
+  const { signup, loading, isAuthenticated } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({
     fullname: '',
@@ -27,14 +27,10 @@ export default function SignupPage() {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (!loading) {
-      // Check if user is already authenticated
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        router.push('/');
-      }
+    if (!loading && isAuthenticated) {
+      router.push('/');
     }
-  }, [loading, router]);
+  }, [loading, isAuthenticated, router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

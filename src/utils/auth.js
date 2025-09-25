@@ -7,10 +7,13 @@ export const setAuthToken = (token) => {
   
   const expires = new Date();
   expires.setTime(expires.getTime() + (1 * 24 * 60 * 60 * 1000)); // expires in 1 days
-  
+
+  const isHttps = typeof window !== 'undefined' && window.location?.protocol === 'https:';
+  const sameSite = isHttps ? 'None' : 'Lax';
+  const secureAttr = isHttps ? '; Secure' : '';
+
   const encodedToken = encodeURIComponent(token);
-  // Set secure cookie
-  document.cookie = `${AUTH_TOKEN_COOKIE}=${encodedToken}; expires=${expires.toUTCString()}; path=/; SameSite=None; Secure`;
+  document.cookie = `${AUTH_TOKEN_COOKIE}=${encodedToken}; expires=${expires.toUTCString()}; path=/; SameSite=${sameSite}${secureAttr}`;
 };
 
 // Get auth token from cookie
@@ -23,7 +26,14 @@ export const getAuthToken = () => {
   for (let i = 0; i < ca.length; i++) {
     let c = ca[i];
     while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    if (c.indexOf(nameEQ) === 0) {
+      const raw = c.substring(nameEQ.length, c.length);
+      try {
+        return decodeURIComponent(raw);
+      } catch (e) {
+        return raw;
+      }
+    }
   }
   return null;
 };
@@ -48,11 +58,22 @@ export const decodeJWT = (token) => {
     
     // Decode the payload (middle part)
     const payload = parts[1];
+    // Convert from base64url to base64
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
     // Add padding if needed for base64 decoding
-    const paddedPayload = payload + '='.repeat((4 - payload.length % 4) % 4);
-    const decodedPayload = atob(paddedPayload);
+    const padded = base64 + '='.repeat((4 - base64.length % 4) % 4);
+
+    // Decode to bytes
+    const binaryString = atob(padded);
+    // Convert binary string to Uint8Array and decode as UTF-8
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const decoder = typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-8') : null;
+    const jsonString = decoder ? decoder.decode(bytes) : binaryString;
     
-    return JSON.parse(decodedPayload);
+    return JSON.parse(jsonString);
   } catch (error) {
     console.error('Error decoding JWT:', error);
     return null;
